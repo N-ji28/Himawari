@@ -1,0 +1,373 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Try-Out HSK 1</title>
+<style>
+:root{
+  --green:#1F4D3A; --green-2:#2C6B50; --bg:#F6F8F6; --card:#FFFFFF; --ink:#1B2420; --muted:#667069;
+  --line:#D9E1DB; --tint:#EAF2ED; --warn:#B45309; --bad:#B42318; --ok:#157347;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Noto Sans SC","Microsoft YaHei",Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink);line-height:1.5;-webkit-text-size-adjust:100%}
+.wrap{max-width:640px;margin:0 auto;padding:16px}
+h1{font-size:26px;margin:8px 0 2px;color:var(--green)}
+.sub{color:var(--muted);margin:0 0 16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}
+label{display:block;font-weight:600;font-size:14px;margin:12px 0 4px}
+input[type=text],input[type=email]{width:100%;font-size:16px;padding:12px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink)}
+input:focus{outline:2px solid var(--green-2);border-color:var(--green-2)}
+ul.rules{margin:6px 0 0;padding-left:20px;color:var(--ink);font-size:14px}
+ul.rules li{margin:4px 0}
+button{font:inherit;cursor:pointer}
+.btn{display:inline-block;width:100%;background:var(--green);color:#fff;border:0;border-radius:12px;padding:14px 16px;font-size:16px;font-weight:700}
+.btn:disabled{opacity:.55;cursor:not-allowed}
+.btn.ghost{background:#fff;color:var(--green);border:1.5px solid var(--green)}
+.btn.small{width:auto;padding:10px 16px;font-size:14px}
+.err{color:var(--bad);font-size:14px;margin-top:10px;min-height:20px}
+.hidden{display:none!important}
+
+/* Ujian */
+.top{position:sticky;top:0;z-index:10;background:var(--green);color:#fff;padding:10px 14px;padding-top:calc(10px + env(safe-area-inset-top))}
+.top .row{display:flex;align-items:center;justify-content:space-between;gap:10px;max-width:640px;margin:0 auto}
+.timer{font-variant-numeric:tabular-nums;font-weight:800;font-size:20px}
+.timer.low{color:#FFD28A}
+.prog{font-size:13px;opacity:.9}
+.bar{height:4px;background:rgba(255,255,255,.25);border-radius:2px;margin:8px auto 0;max-width:640px;overflow:hidden}
+.bar>i{display:block;height:100%;width:0;background:#9AD4B3;transition:width .2s}
+.sec{display:inline-block;background:var(--tint);color:var(--green);font-weight:700;font-size:13px;border-radius:999px;padding:4px 12px;margin-bottom:8px}
+.instr{color:var(--muted);font-size:14px;margin:0 0 10px}
+.qno{font-weight:800;color:var(--green);font-size:18px;margin-bottom:6px}
+.line .hz{font-size:24px;line-height:1.5}
+.line .py{font-size:13px;color:var(--muted)}
+.passage{background:var(--tint);border-left:4px solid var(--green);padding:8px 12px;border-radius:6px;margin-bottom:8px}
+.plain{font-style:italic;font-size:15px;margin-bottom:6px}
+.opt{display:flex;align-items:flex-start;gap:12px;width:100%;text-align:left;background:#fff;border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;margin-top:10px;color:var(--ink)}
+.opt .L{flex:0 0 28px;height:28px;border-radius:50%;background:var(--tint);color:var(--green);font-weight:800;display:flex;align-items:center;justify-content:center}
+.opt .hz{font-size:21px;line-height:1.4}
+.opt .py{font-size:12.5px;color:var(--muted)}
+.opt.sel{border-color:var(--green);background:var(--tint)}
+.opt.sel .L{background:var(--green);color:#fff}
+.audio{background:var(--tint);border-radius:12px;padding:12px;margin-bottom:6px;display:flex;align-items:center;gap:12px}
+.audio .meta{font-size:13px;color:var(--muted)}
+.nav{display:flex;gap:10px;margin-top:16px}
+.nav .btn{flex:1}
+.grid{display:grid;grid-template-columns:repeat(8,1fr);gap:6px;margin-top:10px}
+.g{aspect-ratio:1;border-radius:8px;border:1.5px solid var(--line);background:#fff;font-weight:700;font-size:13px;color:var(--ink);padding:0}
+.g.done{background:var(--tint);border-color:var(--green-2);color:var(--green)}
+.g.cur{outline:2px solid var(--green);outline-offset:1px}
+.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:#222;color:#fff;padding:10px 16px;border-radius:10px;font-size:14px;z-index:30;max-width:90%}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:40;display:flex;align-items:center;justify-content:center;padding:20px}
+.modal .box{background:#fff;border-radius:16px;padding:20px;max-width:420px;width:100%}
+.modal h3{margin:0 0 6px;color:var(--green)}
+.score{font-size:54px;font-weight:800;color:var(--green);text-align:center;margin:4px 0}
+table.res{width:100%;border-collapse:collapse;margin-top:8px}
+table.res td{padding:10px 6px;border-bottom:1px solid var(--line)}
+table.res td:last-child{text-align:right;font-weight:700}
+.saved{font-size:12px;color:var(--muted);text-align:right;margin-top:6px}
+</style>
+</head>
+<body>
+
+<!-- Layar 1: daftar -->
+<div id="s-reg" class="wrap">
+  <h1>Try-Out HSK 1</h1>
+  <p class="sub">40 soal · Tingli, Yuedu, Shuxie · 60 menit</p>
+  <div class="card">
+    <label for="f-nama">Nama lengkap</label>
+    <input id="f-nama" type="text" autocomplete="name" maxlength="80">
+    <label for="f-periode">Periode</label>
+    <input id="f-periode" type="text" maxlength="40" placeholder="contoh: Oktober 2026">
+    <label for="f-laoshi">Nama Laoshi</label>
+    <input id="f-laoshi" type="text" maxlength="80">
+    <label for="f-email">Email</label>
+    <input id="f-email" type="email" autocomplete="email" maxlength="120" inputmode="email">
+    <div class="err" id="reg-err" role="alert"></div>
+    <button class="btn" id="btn-start">Mulai ujian</button>
+  </div>
+  <div class="card">
+    <strong>Aturan singkat</strong>
+    <ul class="rules">
+      <li>Satu email hanya bisa mengerjakan satu kali.</li>
+      <li>Waktu 60 menit berjalan sejak kamu menekan Mulai dan tidak bisa dihentikan.</li>
+      <li>Jawaban tersimpan otomatis. Jika koneksi putus, buka lagi halaman ini dan masuk dengan email yang sama selama waktu masih ada.</li>
+      <li>Tingli: tiap audio hanya bisa diputar dua kali. Pakai headset dan pastikan suara menyala.</li>
+      <li>Jangan berpindah tab atau aplikasi saat ujian. Perpindahan tercatat dan dilihat oleh pengajar.</li>
+    </ul>
+  </div>
+</div>
+
+<!-- Layar 2: ujian -->
+<div id="s-exam" class="hidden">
+  <div class="top">
+    <div class="row">
+      <div><div class="prog" id="prog">0 / 40 terjawab</div></div>
+      <div class="timer" id="timer">60:00</div>
+    </div>
+    <div class="bar"><i id="barfill"></i></div>
+  </div>
+  <div class="wrap">
+    <div class="card" id="qcard"></div>
+    <div class="saved" id="saved"></div>
+    <div class="nav">
+      <button class="btn ghost" id="btn-prev">Sebelumnya</button>
+      <button class="btn" id="btn-next">Berikutnya</button>
+    </div>
+    <div class="card" style="margin-top:14px">
+      <strong>Daftar soal</strong>
+      <div class="grid" id="grid"></div>
+      <button class="btn ghost" style="margin-top:14px" id="btn-finish">Selesai dan kirim jawaban</button>
+    </div>
+  </div>
+</div>
+
+<!-- Layar 3: hasil -->
+<div id="s-done" class="wrap hidden">
+  <h1>Ujian selesai</h1>
+  <p class="sub" id="done-name"></p>
+  <div class="card">
+    <div class="score" id="done-total">0 / 40</div>
+    <table class="res">
+      <tr><td>听力 Tingli</td><td id="r-t"></td></tr>
+      <tr><td>阅读 Yuedu</td><td id="r-r"></td></tr>
+      <tr><td>书写 Shuxie</td><td id="r-s"></td></tr>
+    </table>
+  </div>
+  <p class="sub">Jawaban kamu sudah terkirim. Pembahasan akan dibagikan oleh Laoshi.</p>
+</div>
+
+<div id="modal" class="modal hidden"><div class="box" id="modal-box"></div></div>
+
+<script>
+(function(){
+'use strict';
+// Kunci publishable Supabase aman di sisi klien: tabel tertutup, semua akses lewat fungsi RPC.
+var SB_URL = 'https://vvzspxhriyznhdmkwspb.supabase.co';
+var SB_KEY = 'sb_publishable_Lv708mRn4nZ6zG3t_6Prqw_fLObVyc4';
+var LS = 'tryout_hsk1_v1';
+
+var S = { sid:null, deadline:0, offset:0, qs:[], ans:{}, cur:0, submitted:false, plays:{}, saveTimer:null, tick:null };
+
+function $(id){ return document.getElementById(id); }
+function el(tag, cls, text){ var e=document.createElement(tag); if(cls) e.className=cls; if(text!=null) e.textContent=text; return e; }
+
+function rpc(fn, body){
+  return fetch(SB_URL + '/rest/v1/rpc/' + fn, {
+    method:'POST',
+    headers:{ 'apikey':SB_KEY, 'Content-Type':'application/json' },
+    body: JSON.stringify(body)
+  }).then(function(r){
+    return r.json().catch(function(){ return null; }).then(function(j){
+      if(!r.ok){ var m=(j&&j.message)||('HTTP '+r.status); var e=new Error(m); throw e; }
+      return j;
+    });
+  });
+}
+
+var ERR = {
+  DATA_TIDAK_VALID:'Data belum lengkap atau tidak valid. Periksa nama, periode, nama Laoshi, dan email.',
+  SUDAH_SELESAI:'Email ini sudah menyelesaikan ujian. Satu email hanya bisa satu kali.',
+  WAKTU_HABIS:'Waktu ujian untuk email ini sudah habis.',
+  SESI_TIDAK_ADA:'Sesi tidak ditemukan. Muat ulang halaman dan masuk lagi.'
+};
+function errText(e){ var m=String(e&&e.message||''); for(var k in ERR){ if(m.indexOf(k)>-1) return ERR[k]; } return 'Koneksi bermasalah. Coba lagi sebentar.'; }
+
+function show(id){ ['s-reg','s-exam','s-done'].forEach(function(x){ $(x).classList.toggle('hidden', x!==id); }); window.scrollTo(0,0); }
+function toast(msg){ var t=el('div','toast',msg); document.body.appendChild(t); setTimeout(function(){ t.remove(); }, 2600); }
+
+// ---------- localStorage (cadangan ringan) ----------
+function lsGet(){ try{ return JSON.parse(localStorage.getItem(LS)||'null'); }catch(e){ return null; } }
+function lsSet(o){ try{ localStorage.setItem(LS, JSON.stringify(o)); }catch(e){} }
+
+// ---------- Daftar ----------
+$('btn-start').addEventListener('click', function(){
+  var b=$('btn-start'); $('reg-err').textContent='';
+  var nama=$('f-nama').value, periode=$('f-periode').value, laoshi=$('f-laoshi').value, email=$('f-email').value;
+  if(!nama.trim()||!periode.trim()||!laoshi.trim()||!email.trim()){ $('reg-err').textContent='Semua kolom wajib diisi.'; return; }
+  b.disabled=true; b.textContent='Memuat soal…';
+  rpc('tryout_start', { p_nama:nama, p_periode:periode, p_laoshi:laoshi, p_email:email }).then(function(r){
+    S.sid=r.session_id; S.deadline=new Date(r.deadline).getTime(); S.offset=new Date(r.server_now).getTime()-Date.now();
+    S.qs=r.questions; S.ans=r.answers||{};
+    var saved=lsGet(); if(saved && saved.sid===S.sid){ S.plays=saved.plays||{}; if(saved.ans){ for(var k in saved.ans){ if(!(k in S.ans)) S.ans[k]=saved.ans[k]; } } }
+    lsSet({ sid:S.sid, plays:S.plays, ans:S.ans, email:email.trim().toLowerCase() });
+    startExam();
+  }).catch(function(e){
+    $('reg-err').textContent=errText(e); b.disabled=false; b.textContent='Mulai ujian';
+  });
+});
+
+// ---------- Ujian ----------
+function secInfo(id){
+  if(id<=15) return { tag:'一、听力 Tingli', part: id<=5 ? 'Bagian 1: dengarkan kalimat, pilih kalimat yang sama.' : 'Dengarkan dialog dan pertanyaan, lalu pilih jawaban.' };
+  if(id<=30) return { tag:'二、阅读 Yuedu', part: id<=20 ? 'Pilih kata yang tepat untuk mengisi bagian yang kosong.' : (id<=25 ? 'Pilih jawaban yang cocok untuk kalimat.' : 'Baca teks pendek, lalu jawab pertanyaannya.') };
+  return { tag:'三、书写 Shuxie', part: id<=35 ? 'Susun kata menjadi kalimat yang benar.' : 'Pilih tulisan (hanzi) atau kalimat yang benar.' };
+}
+
+function startExam(){
+  show('s-exam');
+  buildGrid(); renderQ(0); updateProg();
+  tickTimer(); S.tick=setInterval(tickTimer, 500);
+}
+
+function nowMs(){ return Date.now()+S.offset; }
+function tickTimer(){
+  var left=Math.max(0, S.deadline-nowMs());
+  var m=Math.floor(left/60000), s=Math.floor((left%60000)/1000);
+  var t=$('timer'); t.textContent=(m<10?'0':'')+m+':'+(s<10?'0':'')+s; t.classList.toggle('low', left<5*60000);
+  if(left<=0 && !S.submitted){ finish(true); }
+}
+
+function buildGrid(){
+  var g=$('grid'); g.textContent='';
+  S.qs.forEach(function(q,i){
+    var b=el('button','g',String(q.id)); b.type='button'; b.setAttribute('aria-label','Soal '+q.id);
+    b.addEventListener('click', function(){ renderQ(i); window.scrollTo(0,0); });
+    g.appendChild(b);
+  });
+}
+function updateProg(){
+  var n=0; S.qs.forEach(function(q,i){ var a=S.ans[String(q.id)]; var b=$('grid').children[i]; var d=!!a; if(d) n++; b.classList.toggle('done', d); b.classList.toggle('cur', i===S.cur); });
+  $('prog').textContent=n+' / '+S.qs.length+' terjawab';
+  $('barfill').style.width=(n/S.qs.length*100)+'%';
+}
+
+function lineBlock(ln, isPassage, cls){
+  var d=el('div', 'line'+(isPassage?' passage':'')+(cls?' '+cls:''));
+  d.appendChild(el('div','hz',ln.hanzi));
+  if(ln.py) d.appendChild(el('div','py',ln.py));
+  return d;
+}
+
+function renderQ(i){
+  S.cur=i; var q=S.qs[i], p=q.q, card=$('qcard'); card.textContent='';
+  var info=secInfo(q.id);
+  var prev=i>0?secInfo(S.qs[i-1].id):null;
+  card.appendChild(el('span','sec',info.tag));
+  card.appendChild(el('p','instr',info.part));
+  card.appendChild(el('div','qno','Soal '+q.id));
+
+  if(q.sec==='T') card.appendChild(audioBlock(q.id));
+
+  if(p.stem){
+    if(p.stem.plain) card.appendChild(el('div','plain',p.stem.plain));
+    else p.stem.lines.forEach(function(ln,idx){
+      var isLast=idx===p.stem.lines.length-1;
+      card.appendChild(lineBlock(ln, p.kind==='baca' && !isLast));
+    });
+  }
+  var cur=S.ans[String(q.id)];
+  p.opts.forEach(function(o,idx){
+    var L='ABC'[idx];
+    var b=el('button','opt'+(cur===L?' sel':'')); b.type='button';
+    b.setAttribute('aria-pressed', cur===L?'true':'false');
+    b.appendChild(el('span','L',L));
+    var box=el('div');
+    if(o.plain) box.appendChild(el('div','hz',o.plain));
+    else { box.appendChild(el('div','hz',o.lines[0].hanzi)); if(o.lines[0].py) box.appendChild(el('div','py',o.lines[0].py)); }
+    b.appendChild(box);
+    b.addEventListener('click', function(){ setAnswer(q.id, L); });
+    card.appendChild(b);
+  });
+  $('btn-prev').disabled = i===0;
+  $('btn-next').textContent = i===S.qs.length-1 ? 'Ke daftar soal' : 'Berikutnya';
+  updateProg();
+}
+
+function setAnswer(id, L){
+  S.ans[String(id)]=L;
+  lsSet({ sid:S.sid, plays:S.plays, ans:S.ans, email:(lsGet()||{}).email });
+  renderQ(S.cur);
+  clearTimeout(S.saveTimer);
+  $('saved').textContent='Menyimpan…';
+  S.saveTimer=setTimeout(saveNow, 700);
+}
+function saveNow(){
+  if(S.submitted) return Promise.resolve();
+  return rpc('tryout_save', { p_session:S.sid, p_answers:S.ans }).then(function(r){
+    $('saved').textContent='Tersimpan';
+    if(r&&r.server_now) S.offset=new Date(r.server_now).getTime()-Date.now();
+  }).catch(function(e){ $('saved').textContent='Belum tersimpan, akan dicoba lagi'; setTimeout(saveNow, 4000); });
+}
+
+// ---------- Audio (maksimal 2 kali putar) ----------
+function audioBlock(id){
+  var box=el('div','audio'); var key=String(id);
+  var btn=el('button','btn small','▶ Putar'); btn.type='button'; btn.style.width='auto';
+  var meta=el('div','meta'); box.appendChild(btn); box.appendChild(meta);
+  var a=new Audio(); a.preload='none'; a.src='audio/q'+id+'.mp3'; var broken=false;
+  function refresh(){
+    var used=S.plays[key]||0, left=2-used;
+    if(broken){ btn.disabled=true; meta.textContent='Audio belum tersedia untuk soal ini.'; return; }
+    btn.disabled = left<=0 || !a.paused;
+    meta.textContent = left>0 ? ('Sisa putar: '+left+' kali') : 'Audio sudah diputar dua kali.';
+  }
+  a.addEventListener('error', function(){ broken=true; refresh(); });
+  a.addEventListener('ended', function(){ refresh(); });
+  btn.addEventListener('click', function(){
+    var used=S.plays[key]||0; if(used>=2) return;
+    S.plays[key]=used+1; lsSet({ sid:S.sid, plays:S.plays, ans:S.ans, email:(lsGet()||{}).email });
+    a.currentTime=0; a.play().then(refresh).catch(function(){ S.plays[key]=used; broken=true; refresh(); });
+    btn.disabled=true; meta.textContent='Sedang diputar…';
+  });
+  refresh();
+  // hentikan audio saat pindah soal
+  var obs=new MutationObserver(function(){ if(!document.body.contains(box)){ a.pause(); obs.disconnect(); } });
+  obs.observe(document.body,{childList:true,subtree:true});
+  return box;
+}
+
+// ---------- Navigasi ----------
+$('btn-prev').addEventListener('click', function(){ if(S.cur>0){ renderQ(S.cur-1); window.scrollTo(0,0); } });
+$('btn-next').addEventListener('click', function(){
+  if(S.cur<S.qs.length-1){ renderQ(S.cur+1); window.scrollTo(0,0); }
+  else { $('grid').scrollIntoView({behavior:'smooth'}); }
+});
+
+// ---------- Selesai ----------
+$('btn-finish').addEventListener('click', function(){
+  var un=S.qs.filter(function(q){ return !S.ans[String(q.id)]; }).length;
+  var m=$('modal-box'); m.textContent='';
+  m.appendChild(el('h3',null,'Kirim jawaban?'));
+  m.appendChild(el('p',null, un>0 ? ('Masih ada '+un+' soal yang belum dijawab. Setelah dikirim, jawaban tidak bisa diubah.') : 'Semua soal sudah dijawab. Setelah dikirim, jawaban tidak bisa diubah.'));
+  var row=el('div'); row.style.cssText='display:flex;gap:10px;margin-top:12px';
+  var no=el('button','btn ghost','Kembali'); no.type='button';
+  var yes=el('button','btn','Kirim'); yes.type='button';
+  no.addEventListener('click', function(){ $('modal').classList.add('hidden'); });
+  yes.addEventListener('click', function(){ $('modal').classList.add('hidden'); finish(false); });
+  row.appendChild(no); row.appendChild(yes); m.appendChild(row);
+  $('modal').classList.remove('hidden');
+});
+
+function finish(auto){
+  if(S.submitted) return; S.submitted=true; clearInterval(S.tick); clearTimeout(S.saveTimer);
+  if(auto) toast('Waktu habis, jawaban dikirim otomatis.');
+  var tries=0;
+  (function go(){
+    rpc('tryout_submit', { p_session:S.sid, p_answers:S.ans }).then(function(r){
+      try{ localStorage.removeItem(LS); }catch(e){}
+      $('done-name').textContent=r.nama;
+      $('done-total').textContent=r.total+' / '+r.max_total;
+      $('r-t').textContent=r.tingli+' / '+r.max_tingli;
+      $('r-r').textContent=r.yuedu+' / '+r.max_yuedu;
+      $('r-s').textContent=r.shuxie+' / '+r.max_shuxie;
+      show('s-done');
+    }).catch(function(e){
+      if(++tries<6){ setTimeout(go, 2000*tries); toast('Mengirim ulang…'); }
+      else { S.submitted=false; toast('Gagal mengirim. Periksa koneksi, lalu tekan Kirim lagi.'); }
+    });
+  })();
+}
+
+// ---------- Pencatatan perpindahan tab ----------
+function logEv(t){ if(S.sid && !S.submitted) rpc('tryout_event', { p_session:S.sid, p_type:t }).catch(function(){}); }
+document.addEventListener('visibilitychange', function(){ if(document.hidden){ logEv('tab_hidden'); } else if(S.sid && !S.submitted){ toast('Perpindahan tab tercatat.'); } });
+window.addEventListener('blur', function(){ logEv('blur'); });
+
+window.addEventListener('beforeunload', function(e){ if(S.sid && !S.submitted){ e.preventDefault(); e.returnValue=''; } });
+})();
+</script>
+</body>
+</html>
