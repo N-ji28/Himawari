@@ -34,6 +34,7 @@ button{font:inherit;cursor:pointer}
 .top{position:sticky;top:0;z-index:10;background:var(--green);color:#fff;padding:10px 14px;padding-top:calc(10px + env(safe-area-inset-top))}
 .top .row{display:flex;align-items:center;justify-content:space-between;gap:10px;max-width:640px;margin:0 auto}
 .timer{font-variant-numeric:tabular-nums;font-weight:800;font-size:20px}
+.tl{background:rgba(255,255,255,.18);color:#fff;border:1px solid rgba(255,255,255,.5);border-radius:8px;padding:6px 10px;font-size:13px;font-weight:700}
 .timer.low{color:#FFD28A}
 .prog{font-size:13px;opacity:.9}
 .bar{height:4px;background:rgba(255,255,255,.25);border-radius:2px;margin:8px auto 0;max-width:640px;overflow:hidden}
@@ -49,7 +50,7 @@ button{font:inherit;cursor:pointer}
 .opt .L{flex:0 0 28px;height:28px;border-radius:50%;background:var(--tint);color:var(--green);font-weight:800;display:flex;align-items:center;justify-content:center}
 .opt .hz{font-size:21px;line-height:1.4}
 .opt .py{font-size:12.5px;color:var(--muted)}
-.pic{display:block;width:160px;max-width:100%;height:auto;border-radius:12px}
+.pic{display:block;width:110px;max-width:100%;height:auto;border-radius:12px}
 .opt.picopt{align-items:center}
 .logo{display:block;height:44px;width:auto;margin:0 0 14px}
 .opt.sel{border-color:var(--green);background:var(--tint)}
@@ -72,8 +73,6 @@ table.res td{padding:10px 6px;border-bottom:1px solid var(--line)}
 table.res td:last-child{text-align:right;font-weight:700}
 
 .vn h2{font-size:17px;margin:0 0 4px;color:var(--green)}
-.vn .theme{border:1.5px solid var(--line);border-radius:12px;padding:12px;margin-top:12px;background:#fff}
-.vn .theme.ok{border-color:var(--ok);background:#F2FAF5}
 .vn .tt{font-weight:800;color:var(--green)}
 .vn .hz{font-size:20px;line-height:1.5}
 .vn .py{font-size:12.5px;color:var(--muted)}
@@ -122,7 +121,7 @@ table.res td:last-child{text-align:right;font-weight:700}
   <div class="top">
     <div class="row">
       <div><div class="prog" id="prog">0 / 40 terjawab</div></div>
-      <div class="timer" id="timer">60:00</div>
+      <div style="display:flex;align-items:center;gap:12px"><button type="button" id="btn-list" class="tl">Daftar soal</button><div class="timer" id="timer">60:00</div></div>
     </div>
     <div class="bar"><i id="barfill"></i></div>
   </div>
@@ -132,16 +131,6 @@ table.res td:last-child{text-align:right;font-weight:700}
     <div class="nav">
       <button class="btn ghost" id="btn-prev">Sebelumnya</button>
       <button class="btn" id="btn-next">Berikutnya</button>
-    </div>
-    <div class="card vn" id="vncard">
-      <h2>四、口语 Kouyu (Voice Note)</h2>
-      <p class="instr">Rekam voice note dalam bahasa Mandarin, maksimal 60 detik per tema. Ceritakan dengan kalimat sederhana. Boleh rekam ulang sebelum kirim. Dinilai oleh Laoshi (terpisah dari 40 soal).</p>
-      <div id="vnbody"></div>
-    </div>
-    <div class="card" style="margin-top:14px">
-      <strong>Daftar soal</strong>
-      <div class="grid" id="grid"></div>
-      <button class="btn ghost" style="margin-top:14px" id="btn-finish">Selesai dan kirim jawaban</button>
     </div>
   </div>
 </div>
@@ -162,6 +151,13 @@ table.res td:last-child{text-align:right;font-weight:700}
   <p class="sub">Jawaban kamu sudah terkirim. Pembahasan akan dibagikan oleh Laoshi.</p>
 </div>
 
+<div id="panel" class="modal hidden"><div class="box">
+  <h3>Daftar soal</h3>
+  <p class="sub" style="margin:0">Ketuk nomor untuk berpindah. 41–42 adalah voice note (Kouyu).</p>
+  <div class="grid" id="grid"></div>
+  <button class="btn ghost" style="margin-top:14px" id="btn-finish">Selesai dan kirim jawaban</button>
+  <button class="btn" style="margin-top:8px" id="btn-closepanel">Kembali ke soal</button>
+</div></div>
 <div id="modal" class="modal hidden"><div class="box" id="modal-box"></div></div>
 
 <script>
@@ -213,7 +209,7 @@ $('btn-start').addEventListener('click', function(){
   b.disabled=true; b.textContent='Memuat soal…';
   rpc('tryout_start', { p_nama:nama, p_periode:periode, p_laoshi:laoshi, p_email:email }).then(function(r){
     S.sid=r.session_id; S.deadline=new Date(r.deadline).getTime(); S.offset=new Date(r.server_now).getTime()-Date.now();
-    S.qs=r.questions; S.ans=r.answers||{};
+    S.qs=r.questions.concat([{id:41,sec:'V',q:{kind:'vn',n:1}},{id:42,sec:'V',q:{kind:'vn',n:2}}]); S.ans=r.answers||{};
     var saved=lsGet(); if(saved && saved.sid===S.sid){ S.plays=saved.plays||{}; if(saved.ans){ for(var k in saved.ans){ if(!(k in S.ans)) S.ans[k]=saved.ans[k]; } } }
     lsSet({ sid:S.sid, plays:S.plays, ans:S.ans, email:email.trim().toLowerCase() });
     startExam();
@@ -224,6 +220,7 @@ $('btn-start').addEventListener('click', function(){
 
 // ---------- Ujian ----------
 function secInfo(id){
+  if(id>40) return { tag:'四、口语 Kouyu (Voice Note)', part:'Rekam voice note dalam bahasa Mandarin, maksimal 60 detik. Ceritakan dengan kalimat sederhana. Dinilai oleh Laoshi, terpisah dari soal 1–40.' };
   if(id<=15) return { tag:'一、听力 Tingli', part: id<=5 ? 'Bagian 1: dengarkan kalimat. Soal 1 pilih kalimat yang sama; soal 2–5 pilih gambar yang cocok.' : 'Dengarkan dialog dan pertanyaan, lalu pilih jawaban.' };
   if(id<=30) return { tag:'二、阅读 Yuedu', part: id<=20 ? 'Baca kalimat, lalu pilih gambar yang cocok.' : (id<=25 ? 'Pilih jawaban yang cocok untuk kalimat.' : 'Baca teks pendek, lalu jawab pertanyaannya.') };
   return { tag:'三、书写 Shuxie', part: id<=35 ? 'Susun kata menjadi kalimat yang benar.' : 'Pilih tulisan (hanzi) atau kalimat yang benar.' };
@@ -247,12 +244,12 @@ function buildGrid(){
   var g=$('grid'); g.textContent='';
   S.qs.forEach(function(q,i){
     var b=el('button','g',String(q.id)); b.type='button'; b.setAttribute('aria-label','Soal '+q.id);
-    b.addEventListener('click', function(){ renderQ(i); window.scrollTo(0,0); });
+    b.addEventListener('click', function(){ $('panel').classList.add('hidden'); renderQ(i); window.scrollTo(0,0); });
     g.appendChild(b);
   });
 }
 function updateProg(){
-  var n=0; S.qs.forEach(function(q,i){ var a=S.ans[String(q.id)]; var b=$('grid').children[i]; var d=!!a; if(d) n++; b.classList.toggle('done', d); b.classList.toggle('cur', i===S.cur); });
+  var n=0; S.qs.forEach(function(q,i){ var a = q.sec==='V' ? VN.done[q.q.n] : S.ans[String(q.id)]; var b=$('grid').children[i]; var d=!!a; if(d) n++; b.classList.toggle('done', d); b.classList.toggle('cur', i===S.cur); });
   $('prog').textContent=n+' / '+S.qs.length+' terjawab';
   $('barfill').style.width=(n/S.qs.length*100)+'%';
 }
@@ -265,13 +262,15 @@ function lineBlock(ln, isPassage, cls){
 }
 
 function renderQ(i){
+  if(VN.rec && VN.rec.state==='recording' && !(S.qs[i].sec==='V' && S.qs[i].q.n===VN.cur)){ toast('Berhenti merekam dulu sebelum pindah soal.'); return; }
   S.cur=i; var q=S.qs[i], p=q.q, card=$('qcard'); card.textContent='';
   var info=secInfo(q.id);
   var prev=i>0?secInfo(S.qs[i-1].id):null;
   card.appendChild(el('span','sec',info.tag));
   card.appendChild(el('p','instr',info.part));
-  card.appendChild(el('div','qno','Soal '+q.id));
+  card.appendChild(el('div','qno',(q.sec==='V'?'Voice Note ':'Soal ')+q.id));
 
+  if(q.sec==='V'){ vnTheme(card, p.n); $('btn-prev').disabled = i===0; $('btn-next').textContent = i===S.qs.length-1 ? 'Ke daftar soal' : 'Berikutnya'; updateProg(); return; }
   if(q.sec==='T') card.appendChild(audioBlock(q.id));
 
   if(p.stem){
@@ -288,7 +287,7 @@ function renderQ(i){
     b.setAttribute('aria-pressed', cur===L?'true':'false');
     b.appendChild(el('span','L',L));
     var box=el('div');
-    if(o.img){ var im=el('img','pic'); im.src='img/'+o.img+'.png'; im.alt='Gambar '+L; im.width=160; im.height=160; box.appendChild(im); b.classList.add('picopt'); }
+    if(o.img){ var im=el('img','pic'); im.src='img/'+o.img+'.png'; im.alt='Gambar '+L; im.width=110; im.height=110; box.appendChild(im); b.classList.add('picopt'); }
     else if(o.plain) box.appendChild(el('div','hz',o.plain));
     else { box.appendChild(el('div','hz',o.lines[0].hanzi)); if(o.lines[0].py) box.appendChild(el('div','py',o.lines[0].py)); }
     b.appendChild(box);
@@ -347,12 +346,15 @@ function audioBlock(id){
 $('btn-prev').addEventListener('click', function(){ if(S.cur>0){ renderQ(S.cur-1); window.scrollTo(0,0); } });
 $('btn-next').addEventListener('click', function(){
   if(S.cur<S.qs.length-1){ renderQ(S.cur+1); window.scrollTo(0,0); }
-  else { $('grid').scrollIntoView({behavior:'smooth'}); }
+  else { $('panel').classList.remove('hidden'); }
 });
+
+$('btn-list').addEventListener('click', function(){ $('panel').classList.remove('hidden'); });
+$('btn-closepanel').addEventListener('click', function(){ $('panel').classList.add('hidden'); });
 
 // ---------- Selesai ----------
 $('btn-finish').addEventListener('click', function(){
-  var un=S.qs.filter(function(q){ return !S.ans[String(q.id)]; }).length;
+  var un=S.qs.filter(function(q){ return q.sec!=='V' && !S.ans[String(q.id)]; }).length;
   var m=$('modal-box'); m.textContent='';
   m.appendChild(el('h3',null,'Kirim jawaban?'));
   m.appendChild(el('p',null, un>0 ? ('Masih ada '+un+' soal yang belum dijawab. Setelah dikirim, jawaban tidak bisa diubah.') : 'Semua soal sudah dijawab. Setelah dikirim, jawaban tidak bisa diubah.'));
@@ -362,92 +364,92 @@ $('btn-finish').addEventListener('click', function(){
   var no=el('button','btn ghost','Kembali'); no.type='button';
   var yes=el('button','btn','Kirim'); yes.type='button';
   no.addEventListener('click', function(){ $('modal').classList.add('hidden'); });
-  yes.addEventListener('click', function(){ $('modal').classList.add('hidden'); finish(false); });
+  yes.addEventListener('click', function(){ $('modal').classList.add('hidden'); $('panel').classList.add('hidden'); finish(false); });
   row.appendChild(no); row.appendChild(yes); m.appendChild(row);
   $('modal').classList.remove('hidden');
 });
 
 
 // ---------- Voice note (Kouyu) ----------
-var VN_THEMES = [
-  { n:1, title:'Tema 1: 在咖啡店 (Di kafe)', hz:'我在咖啡店。', py:'Wǒ zài kāfēidiàn.',
+var VN_THEMES = {
+  1:{ title:'Tema 1: 在咖啡店 (Di kafe)', hz:'我在咖啡店。', py:'Wǒ zài kāfēidiàn.',
     qs:[ ['你在哪儿？','Nǐ zài nǎr?'], ['你想喝什么？','Nǐ xiǎng hē shénme?'], ['你想吃什么？','Nǐ xiǎng chī shénme?'], ['这个多少钱？','Zhège duōshao qián?'] ] },
-  { n:2, title:'Tema 2: 买东西 (Belanja)', hz:'我去商店买东西。', py:'Wǒ qù shāngdiàn mǎi dōngxi.',
+  2:{ title:'Tema 2: 买东西 (Belanja)', hz:'我去商店买东西。', py:'Wǒ qù shāngdiàn mǎi dōngxi.',
     qs:[ ['你去哪儿买东西？','Nǐ qù nǎr mǎi dōngxi?'], ['你买什么？','Nǐ mǎi shénme?'], ['多少钱？','Duōshao qián?'], ['你喜欢吗？','Nǐ xǐhuan ma?'] ] }
-];
-var VN = { done:{}, rec:null, chunks:[], stream:null, timer:null, t0:0, blob:null, mime:'', cur:0, secs:0 };
+};
+var VN = { done:{}, pend:{}, rec:null, chunks:[], stream:null, timer:null, t0:0, mime:'', cur:0 };
 function vnPickMime(){
   var c=['audio/webm;codecs=opus','audio/webm','audio/mp4','audio/ogg;codecs=opus'];
   if(window.MediaRecorder && MediaRecorder.isTypeSupported){ for(var i=0;i<c.length;i++){ if(MediaRecorder.isTypeSupported(c[i])) return c[i]; } }
   return '';
 }
-function vnRender(){
-  var body=$('vnbody'); body.textContent='';
+function vnTheme(card, n){
+  var t=VN_THEMES[n];
   var canRec = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia && window.MediaRecorder);
-  VN_THEMES.forEach(function(t){
-    var box=el('div','theme'+(VN.done[t.n]?' ok':'')); box.id='vn'+t.n;
-    box.appendChild(el('div','tt',t.title));
-    var l1=el('div','line'); l1.appendChild(el('div','hz',t.hz)); l1.appendChild(el('div','py',t.py)); box.appendChild(l1);
-    box.appendChild(el('div','st','Pertanyaan pemandu (jawab dalam ceritamu):'));
-    t.qs.forEach(function(q){ var d=el('div','line'); d.appendChild(el('div','hz',q[0])); d.appendChild(el('div','py',q[1])); box.appendChild(d); });
-    var ctl=el('div','ctl'); var st=el('span','st', VN.done[t.n] ? 'Terkirim ('+Math.round(VN.done[t.n])+' dtk). Boleh rekam ulang.' : 'Belum direkam.'); st.id='vnst'+t.n;
-    var b=el('button','btn small'+(VN.done[t.n]?' ghost':''), VN.done[t.n]?'Rekam ulang':'Mulai rekam'); b.type='button'; b.id='vnbtn'+t.n;
-    if(!canRec){ b.disabled=true; st.textContent='Browser ini tidak mendukung rekam. Pakai Chrome atau Safari terbaru.'; }
-    b.addEventListener('click', function(){ vnToggle(t.n); });
-    ctl.appendChild(b); ctl.appendChild(st); box.appendChild(ctl);
-    box.appendChild(el('div','vnprev')); box.lastChild.id='vnprev'+t.n;
-    body.appendChild(box);
-  });
+  var box=el('div','vn');
+  box.appendChild(el('div','tt',t.title));
+  var l1=el('div','line'); l1.appendChild(el('div','hz',t.hz)); l1.appendChild(el('div','py',t.py)); box.appendChild(l1);
+  box.appendChild(el('div','st','Pertanyaan pemandu (jawab dalam ceritamu):'));
+  t.qs.forEach(function(q){ var d=el('div','line'); d.appendChild(el('div','hz',q[0])); d.appendChild(el('div','py',q[1])); box.appendChild(d); });
+  var ctl=el('div','ctl');
+  var b=el('button','btn small'+(VN.done[n]?' ghost':''), VN.done[n]?'Rekam ulang':'Mulai rekam'); b.type='button'; b.id='vnbtn'+n;
+  var st=el('span','st', VN.done[n] ? 'Terkirim ('+Math.round(VN.done[n])+' dtk). Boleh rekam ulang.' : 'Belum direkam.'); st.id='vnst'+n;
+  if(!canRec){ b.disabled=true; st.textContent='Browser ini tidak mendukung rekam. Pakai Chrome atau Safari terbaru.'; }
+  b.addEventListener('click', function(){ vnToggle(n); });
+  ctl.appendChild(b); ctl.appendChild(st); box.appendChild(ctl);
+  var pv=el('div'); pv.id='vnprev'+n; box.appendChild(pv);
+  card.appendChild(box);
+  if(VN.rec && VN.rec.state==='recording' && VN.cur===n){ b.textContent='Berhenti'; b.classList.remove('ghost'); b.classList.add('rec'); }
+  else if(VN.pend[n]) vnPreview(n);
 }
 function vnStopStream(){ if(VN.stream){ VN.stream.getTracks().forEach(function(x){ x.stop(); }); VN.stream=null; } clearInterval(VN.timer); }
 function vnToggle(n){
   if(VN.rec && VN.rec.state==='recording'){ if(VN.cur===n){ VN.rec.stop(); return; } toast('Selesaikan rekaman yang sedang berjalan.'); return; }
-  VN.cur=n; VN.chunks=[]; VN.blob=null; $('vnprev'+n).textContent='';
+  VN.cur=n; VN.chunks=[]; delete VN.pend[n]; $('vnprev'+n).textContent='';
   navigator.mediaDevices.getUserMedia({audio:true}).then(function(stream){
-    VN.stream=stream; VN.mime=vnPickMime();
-    var rec = VN.mime ? new MediaRecorder(stream,{mimeType:VN.mime}) : new MediaRecorder(stream);
-    VN.rec=rec; VN.mime = rec.mimeType || VN.mime || 'audio/webm';
+    VN.stream=stream; var mt=vnPickMime();
+    var rec = mt ? new MediaRecorder(stream,{mimeType:mt}) : new MediaRecorder(stream);
+    VN.rec=rec; VN.mime = rec.mimeType || mt || 'audio/webm';
     rec.ondataavailable=function(e){ if(e.data && e.data.size) VN.chunks.push(e.data); };
     rec.onstop=function(){
       vnStopStream();
-      VN.secs=(Date.now()-VN.t0)/1000;
-      VN.blob=new Blob(VN.chunks,{type:VN.mime});
-      $('vnbtn'+n).textContent='Rekam ulang'; $('vnbtn'+n).classList.add('ghost');
-      vnPreview(n);
+      var secs=(Date.now()-VN.t0)/1000;
+      VN.pend[n]={ blob:new Blob(VN.chunks,{type:VN.mime}), secs:secs };
+      if(S.qs[S.cur] && S.qs[S.cur].sec==='V' && S.qs[S.cur].q.n===n){ var bb=$('vnbtn'+n); if(bb){ bb.textContent='Rekam ulang'; bb.classList.remove('rec'); bb.classList.add('ghost'); } vnPreview(n); }
     };
     VN.t0=Date.now(); rec.start();
-    $('vnbtn'+n).textContent='Berhenti'; $('vnbtn'+n).classList.remove('ghost'); $('vnbtn'+n).classList.add('rec');
+    var bb=$('vnbtn'+n); bb.textContent='Berhenti'; bb.classList.remove('ghost'); bb.classList.add('rec');
     VN.timer=setInterval(function(){
       var sec=Math.floor((Date.now()-VN.t0)/1000);
-      $('vnst'+n).textContent='Merekam… '+sec+' / 60 dtk';
+      var s2=$('vnst'+n); if(s2) s2.textContent='Merekam… '+sec+' / 60 dtk';
       if(sec>=60 && VN.rec && VN.rec.state==='recording') VN.rec.stop();
     },250);
   }).catch(function(){ toast('Izin mikrofon ditolak. Izinkan mikrofon di pengaturan browser.'); });
 }
 function vnPreview(n){
-  var box=$('vnprev'+n); box.textContent='';
-  $('vnbtn'+n).classList.remove('rec');
-  if(!VN.blob || VN.blob.size<1000){ $('vnst'+n).textContent='Rekaman kosong. Coba lagi.'; return; }
-  $('vnst'+n).textContent='Dengarkan dulu, lalu kirim ('+Math.round(VN.secs)+' dtk).';
-  var a=document.createElement('audio'); a.controls=true; a.src=URL.createObjectURL(VN.blob); box.appendChild(a);
+  var box=$('vnprev'+n); if(!box) return; box.textContent='';
+  var p=VN.pend[n];
+  if(!p || p.blob.size<1000){ delete VN.pend[n]; $('vnst'+n).textContent='Rekaman kosong. Coba lagi.'; return; }
+  $('vnst'+n).textContent='Dengarkan dulu, lalu kirim ('+Math.round(p.secs)+' dtk).';
+  var a=document.createElement('audio'); a.controls=true; a.src=URL.createObjectURL(p.blob); box.appendChild(a);
   var send=el('button','btn small','Kirim rekaman'); send.type='button'; send.style.marginTop='8px';
   send.addEventListener('click', function(){ vnSend(n, send); });
   box.appendChild(send);
 }
 function vnSend(n, btn){
-  if(!VN.blob) return; btn.disabled=true; btn.textContent='Mengirim…';
+  var p=VN.pend[n]; if(!p) return; btn.disabled=true; btn.textContent='Mengirim…';
   var fr=new FileReader();
   fr.onload=function(){
     var b64=String(fr.result).split(',')[1]||'';
-    rpc('tryout_vn_save',{ p_session:S.sid, p_tema:n, p_mime:(VN.blob.type||VN.mime||'audio/webm').split(';')[0], p_secs:Math.round(VN.secs*10)/10, p_b64:b64 }).then(function(){
-      VN.done[n]=VN.secs; VN.blob=null; vnRender(); toast('Voice note tema '+n+' terkirim.');
+    rpc('tryout_vn_save',{ p_session:S.sid, p_tema:n, p_mime:(p.blob.type||VN.mime||'audio/webm').split(';')[0], p_secs:Math.round(p.secs*10)/10, p_b64:b64 }).then(function(){
+      VN.done[n]=p.secs; delete VN.pend[n]; toast('Voice note tema '+n+' terkirim.');
+      if(S.qs[S.cur] && S.qs[S.cur].sec==='V' && S.qs[S.cur].q.n===n) renderQ(S.cur); else updateProg();
     }).catch(function(e){ btn.disabled=false; btn.textContent='Kirim rekaman'; toast(errText(e)); });
   };
-  fr.readAsDataURL(VN.blob);
+  fr.readAsDataURL(p.blob);
 }
 function vnLoad(){
-  vnRender();
-  rpc('tryout_vn_list',{ p_session:S.sid }).then(function(r){ (r||[]).forEach(function(x){ VN.done[x.tema]=Number(x.secs)||1; }); vnRender(); }).catch(function(){});
+  rpc('tryout_vn_list',{ p_session:S.sid }).then(function(r){ (r||[]).forEach(function(x){ VN.done[x.tema]=Number(x.secs)||1; }); updateProg(); if(S.qs[S.cur] && S.qs[S.cur].sec==='V') renderQ(S.cur); }).catch(function(){});
 }
 
 function finish(auto){
