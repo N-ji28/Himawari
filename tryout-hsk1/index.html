@@ -49,6 +49,9 @@ button{font:inherit;cursor:pointer}
 .opt .L{flex:0 0 28px;height:28px;border-radius:50%;background:var(--tint);color:var(--green);font-weight:800;display:flex;align-items:center;justify-content:center}
 .opt .hz{font-size:21px;line-height:1.4}
 .opt .py{font-size:12.5px;color:var(--muted)}
+.pic{display:block;width:160px;max-width:100%;height:auto;border-radius:12px}
+.opt.picopt{align-items:center}
+.logo{display:block;height:44px;width:auto;margin:0 0 14px}
 .opt.sel{border-color:var(--green);background:var(--tint)}
 .opt.sel .L{background:var(--green);color:#fff}
 .audio{background:var(--tint);border-radius:12px;padding:12px;margin-bottom:6px;display:flex;align-items:center;gap:12px}
@@ -74,6 +77,7 @@ table.res td:last-child{text-align:right;font-weight:700}
 
 <!-- Layar 1: daftar -->
 <div id="s-reg" class="wrap">
+  <img class="logo" src="img/logo-himawari.png" alt="HIMAWARI 向日葵中文" width="152" height="44">
   <h1>Try-Out HSK 1</h1>
   <p class="sub">40 soal · Tingli, Yuedu, Shuxie · 60 menit</p>
   <div class="card">
@@ -201,8 +205,8 @@ $('btn-start').addEventListener('click', function(){
 
 // ---------- Ujian ----------
 function secInfo(id){
-  if(id<=15) return { tag:'一、听力 Tingli', part: id<=5 ? 'Bagian 1: dengarkan kalimat, pilih kalimat yang sama.' : 'Dengarkan dialog dan pertanyaan, lalu pilih jawaban.' };
-  if(id<=30) return { tag:'二、阅读 Yuedu', part: id<=20 ? 'Pilih kata yang tepat untuk mengisi bagian yang kosong.' : (id<=25 ? 'Pilih jawaban yang cocok untuk kalimat.' : 'Baca teks pendek, lalu jawab pertanyaannya.') };
+  if(id<=15) return { tag:'一、听力 Tingli', part: id<=5 ? 'Bagian 1: dengarkan kalimat. Soal 1 pilih kalimat yang sama; soal 2–5 pilih gambar yang cocok.' : 'Dengarkan dialog dan pertanyaan, lalu pilih jawaban.' };
+  if(id<=30) return { tag:'二、阅读 Yuedu', part: id<=20 ? 'Baca kalimat, lalu pilih gambar yang cocok.' : (id<=25 ? 'Pilih jawaban yang cocok untuk kalimat.' : 'Baca teks pendek, lalu jawab pertanyaannya.') };
   return { tag:'三、书写 Shuxie', part: id<=35 ? 'Susun kata menjadi kalimat yang benar.' : 'Pilih tulisan (hanzi) atau kalimat yang benar.' };
 }
 
@@ -265,7 +269,8 @@ function renderQ(i){
     b.setAttribute('aria-pressed', cur===L?'true':'false');
     b.appendChild(el('span','L',L));
     var box=el('div');
-    if(o.plain) box.appendChild(el('div','hz',o.plain));
+    if(o.img){ var im=el('img','pic'); im.src='img/'+o.img+'.png'; im.alt='Gambar '+L; im.width=160; im.height=160; box.appendChild(im); b.classList.add('picopt'); }
+    else if(o.plain) box.appendChild(el('div','hz',o.plain));
     else { box.appendChild(el('div','hz',o.lines[0].hanzi)); if(o.lines[0].py) box.appendChild(el('div','py',o.lines[0].py)); }
     b.appendChild(box);
     b.addEventListener('click', function(){ setAnswer(q.id, L); });
