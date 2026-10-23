@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Admin Try-Out HSK 1 (Kode 2)</title>
+<style>
+:root{--green:#1F4D3A;--bg:#F6F8F6;--ink:#1B2420;--muted:#667069;--line:#D9E1DB;--tint:#EAF2ED;--bad:#B42318}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.wrap{max-width:1100px;margin:0 auto;padding:16px}
+.logo{height:44px;display:block;margin-bottom:10px}
+h1{font-size:22px;color:var(--green);margin:0 0 4px}.sub{color:var(--muted);margin:0 0 14px}
+.card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:14px}
+input,select{font:inherit;padding:10px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink)}
+button{font:inherit;cursor:pointer;background:var(--green);color:#fff;border:0;border-radius:10px;padding:10px 14px;font-weight:700}
+button.ghost{background:#fff;color:var(--green);border:1.5px solid var(--green)}
+button:disabled{opacity:.55}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+table{width:100%;border-collapse:collapse;font-size:14px}th,td{padding:8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{background:var(--tint);color:var(--green);position:sticky;top:0}
+.tbl{overflow:auto;max-height:70vh}
+.err{color:var(--bad);min-height:20px}.muted{color:var(--muted);font-size:13px}
+.hidden{display:none!important}
+.vn{border:1px solid var(--line);border-radius:10px;padding:8px;margin:6px 0;background:#FBFCFB}
+.vn input[type=number]{width:70px}.vn input[type=text]{width:100%;margin-top:6px}
+audio{width:100%;margin-top:6px}
+.rub{font-size:13px;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <img class="logo" src="img/logo-himawari.png" alt="HIMAWARI 向日葵中文">
+  <h1>Admin Try-Out HSK 1 (Kode 2)</h1>
+  <p class="sub">Hasil peserta, pemutaran voice note (Kouyu), dan penilaian.</p>
+
+  <div class="card" id="login">
+    <div class="row"><input id="pw" type="password" placeholder="Kode admin" autocomplete="off" style="min-width:240px"><button id="go">Masuk</button></div>
+    <div class="err" id="lerr"></div>
+  </div>
+
+  <div id="main" class="hidden">
+    <div class="card row">
+      <input id="q" placeholder="Cari nama, email, laoshi…" style="flex:1;min-width:200px">
+      <select id="per"><option value="">Semua periode</option></select>
+      <button class="ghost" id="reload">Muat ulang</button>
+      <button id="csv">Unduh CSV</button>
+    </div>
+    <div class="card">
+      <div class="rub"><strong>Rubrik VN per tema (0–20)</strong>: lafal dan nada 0–5, kelengkapan isi 0–5, tata bahasa dan kosakata HSK 1 0–5, kelancaran 0–5. Skor VN total = tema 1 + tema 2 (maks 40).</div>
+    </div>
+    <div class="card tbl"><table id="tb"></table></div>
+    <div class="err" id="merr"></div>
+  </div>
+</div>
+<script>
+(function(){
+'use strict';
+var SB_URL='https://vvzspxhriyznhdmkwspb.supabase.co', SB_KEY='sb_publishable_Lv708mRn4nZ6zG3t_6Prqw_fLObVyc4';
+var PW='', DATA=[];
+function $(i){return document.getElementById(i);}
+function el(t,c,x){var e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e;}
+function rpc(fn,b){return fetch(SB_URL+'/rest/v1/rpc/'+fn,{method:'POST',headers:{apikey:SB_KEY,'Content-Type':'application/json'},body:JSON.stringify(b)}).then(function(r){return r.json().catch(function(){return null;}).then(function(j){if(!r.ok)throw new Error((j&&j.message)||('HTTP '+r.status));return j;});});}
+function load(){
+  return rpc('tryout2_admin_list',{p_pass:PW}).then(function(r){DATA=r||[];$('login').classList.add('hidden');$('main').classList.remove('hidden');fillPeriods();render();});
+}
+$('go').addEventListener('click',function(){PW=$('pw').value;$('lerr').textContent='';$('go').disabled=true;
+  load().catch(function(e){$('lerr').textContent=String(e.message).indexOf('AKSES_DITOLAK')>-1?'Kode admin salah.':'Gagal memuat. Coba lagi.';}).then(function(){$('go').disabled=false;});});
+$('pw').addEventListener('keydown',function(e){if(e.key==='Enter')$('go').click();});
+$('reload').addEventListener('click',function(){load().catch(function(){$('merr').textContent='Gagal memuat ulang.';});});
+$('q').addEventListener('input',render);$('per').addEventListener('change',render);
+function fillPeriods(){var cur=$('per').value,set={};DATA.forEach(function(d){set[d.periode]=1;});var s=$('per');s.textContent='';var o=el('option',null,'Semua periode');o.value='';s.appendChild(o);Object.keys(set).sort().forEach(function(p){var x=el('option',null,p);x.value=p;s.appendChild(x);});s.value=cur;}
+function vnTotal(d){var n=0,any=false;(d.vn||[]).forEach(function(v){if(v.score!=null){n+=v.score;any=true;}});return any?n:null;}
+function rows(){var q=$('q').value.toLowerCase(),p=$('per').value;return DATA.filter(function(d){return (!p||d.periode===p)&&(!q||(d.nama+' '+d.email+' '+d.laoshi).toLowerCase().indexOf(q)>-1);});}
+function render(){
+  var t=$('tb');t.textContent='';
+  var h=el('tr');['Nama','Periode','Laoshi','Status','Tingli','Yuedu','Shuxie','Total /40','Tab/blur','VN (dinilai /20 per tema)'].forEach(function(x){h.appendChild(el('th',null,x));});t.appendChild(h);
+  rows().forEach(function(d){
+    var tr=el('tr');
+    var c=el('td');c.appendChild(el('div',null,d.nama));c.appendChild(el('div','muted',d.email));tr.appendChild(c);
+    tr.appendChild(el('td',null,d.periode));tr.appendChild(el('td',null,d.laoshi));
+    tr.appendChild(el('td',null,d.submitted_at?'Selesai':'Berjalan'));
+    ['tingli','yuedu','shuxie','total'].forEach(function(k){tr.appendChild(el('td',null,d[k]==null?'-':String(d[k])));});
+    tr.appendChild(el('td',null,String(d.tab_events||0)));
+    var vc=el('td');
+    [1,2].forEach(function(n){
+      var v=(d.vn||[]).filter(function(x){return x.tema===n;})[0];
+      var box=el('div','vn');box.appendChild(el('strong',null,'Tema '+n+(n===1?' (keluarga)':' (hari Sabtu)')));
+      if(!v){box.appendChild(el('div','muted','Belum ada rekaman.'));vc.appendChild(box);return;}
+      box.appendChild(el('span','muted','  '+Math.round(v.secs)+' dtk'));
+      var play=el('button','ghost','Putar');play.style.marginLeft='8px';play.type='button';
+      var holder=el('div');
+      play.addEventListener('click',function(){play.disabled=true;rpc('tryout2_admin_vn',{p_pass:PW,p_session:d.id,p_tema:n}).then(function(r){
+        holder.textContent='';var a=document.createElement('audio');a.controls=true;a.src='data:'+r.mime+';base64,'+r.b64;holder.appendChild(a);a.play().catch(function(){});
+      }).catch(function(){$('merr').textContent='Gagal memuat rekaman.';}).then(function(){play.disabled=false;});});
+      box.appendChild(play);box.appendChild(holder);
+      var sc=document.createElement('input');sc.type='number';sc.min=0;sc.max=20;sc.placeholder='0-20';if(v.score!=null)sc.value=v.score;
+      var nt=document.createElement('input');nt.type='text';nt.placeholder='Catatan';nt.maxLength=500;if(v.note)nt.value=v.note;
+      var sv=el('button',null,'Simpan');sv.type='button';sv.style.marginLeft='8px';
+      sv.addEventListener('click',function(){var val=sc.value===''?null:Number(sc.value);if(val!==null&&(isNaN(val)||val<0||val>20)){$('merr').textContent='Skor harus 0–20.';return;}
+        sv.disabled=true;rpc('tryout2_admin_score',{p_pass:PW,p_session:d.id,p_tema:n,p_score:val,p_note:nt.value}).then(function(){v.score=val;v.note=nt.value;sv.textContent='Tersimpan';setTimeout(function(){sv.textContent='Simpan';},1200);$('merr').textContent='';})
+        .catch(function(){$('merr').textContent='Gagal menyimpan skor.';}).then(function(){sv.disabled=false;});});
+      var line=el('div');line.style.marginTop='6px';line.appendChild(sc);line.appendChild(sv);box.appendChild(line);box.appendChild(nt);
+      vc.appendChild(box);
+    });
+    var vt=vnTotal(d);vc.appendChild(el('div','muted','VN total: '+(vt==null?'-':vt+' / 40')));
+    tr.appendChild(vc);t.appendChild(tr);
+  });
+}
+function csvEsc(x){x=x==null?'':String(x);return /[",\n]/.test(x)?'"'+x.replace(/"/g,'""')+'"':x;}
+$('csv').addEventListener('click',function(){
+  var out=[['Nama','Email','Periode','Laoshi','Selesai','Tingli','Yuedu','Shuxie','Total40','TabBlur','VN1','VN2','VNTotal40','Catatan VN1','Catatan VN2']];
+  rows().forEach(function(d){var a=(d.vn||[]).filter(function(x){return x.tema===1;})[0]||{},b=(d.vn||[]).filter(function(x){return x.tema===2;})[0]||{};
+    out.push([d.nama,d.email,d.periode,d.laoshi,d.submitted_at?'ya':'tidak',d.tingli,d.yuedu,d.shuxie,d.total,d.tab_events,a.score,b.score,vnTotal(d),a.note,b.note]);});
+  var blob=new Blob(['﻿'+out.map(function(r){return r.map(csvEsc).join(',');}).join('\n')],{type:'text/csv;charset=utf-8'});
+  var u=URL.createObjectURL(blob),l=document.createElement('a');l.href=u;l.download='hasil_tryout_hsk1_kode2.csv';document.body.appendChild(l);l.click();l.remove();setTimeout(function(){URL.revokeObjectURL(u);},1000);
+});
+})();
+</script>
+</body>
+</html>
