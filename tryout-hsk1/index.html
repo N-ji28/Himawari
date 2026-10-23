@@ -112,7 +112,7 @@ table.res td:last-child{text-align:right;font-weight:700}
       <li>Jawaban tersimpan otomatis. Jika koneksi putus, buka lagi halaman ini dan masuk dengan email yang sama selama waktu masih ada.</li>
       <li>Tingli: tiap audio hanya bisa diputar dua kali. Pakai headset dan pastikan suara menyala.</li>
       <li>Ada bagian Voice Note (Kouyu): rekam cerita singkat tentang 2 tema. Izinkan akses mikrofon.</li>
-      <li>Jangan berpindah tab atau aplikasi saat ujian. Perpindahan tercatat dan dilihat oleh pengajar.</li>
+      <li>Jangan berpindah tab atau aplikasi saat ujian. Kamu mendapat 2 kali peringatan; perpindahan ketiga mengunci ujian dan jawabanmu dikirim otomatis.</li>
     </ul>
   </div>
 </div>
@@ -140,6 +140,7 @@ table.res td:last-child{text-align:right;font-weight:700}
 <div id="s-done" class="wrap hidden">
   <h1>Ujian selesai</h1>
   <p class="sub" id="done-name"></p>
+  <p class="sub hidden" id="lock-note" style="color:#B3261E;font-weight:700">Ujian terkunci karena kamu berpindah tab lebih dari 2 kali. Jawabanmu sudah dikirim otomatis.</p>
   <div class="card">
     <div class="score" id="done-total">0 / 40</div>
     <table class="res">
@@ -454,10 +455,10 @@ function vnLoad(){
   rpc('tryout_vn_list',{ p_session:S.sid }).then(function(r){ (r||[]).forEach(function(x){ VN.done[x.tema]=Number(x.secs)||1; }); updateProg(); if(S.qs[S.cur] && S.qs[S.cur].sec==='V') renderQ(S.cur); }).catch(function(){});
 }
 
-function finish(auto){
+function finish(auto,why){
   if(S.submitted) return;
   if(VN.rec && VN.rec.state==='recording'){ try{ VN.rec.stop(); }catch(e){} } S.submitted=true; clearInterval(S.tick); clearTimeout(S.saveTimer);
-  if(auto) toast('Waktu habis, jawaban dikirim otomatis.');
+  if(why==='lock') toast('Ujian terkunci: berpindah tab lebih dari '+MAXV+' kali. Jawaban dikirim otomatis.'); else if(auto) toast('Waktu habis, jawaban dikirim otomatis.');
   var tries=0;
   (function go(){
     rpc('tryout_submit', { p_session:S.sid, p_answers:S.ans }).then(function(r){
@@ -477,7 +478,25 @@ function finish(auto){
 
 // ---------- Pencatatan perpindahan tab ----------
 function logEv(t){ if(S.sid && !S.submitted) rpc('tryout_event', { p_session:S.sid, p_type:t }).catch(function(){}); }
-document.addEventListener('visibilitychange', function(){ if(document.hidden){ logEv('tab_hidden'); } else if(S.sid && !S.submitted){ toast('Perpindahan tab tercatat.'); } });
+var MAXV=2;
+function vGet(){ try{ var o=JSON.parse(localStorage.getItem(LS+'_v')||'null'); return (o&&o.sid===S.sid)?o.n:0; }catch(e){ return 0; } }
+function vSet(n){ try{ localStorage.setItem(LS+'_v', JSON.stringify({sid:S.sid,n:n})); }catch(e){} }
+function vModal(n){
+  var m=el('div','modal'); var b=el('div','card'); b.style.maxWidth='420px';
+  var h=el('strong','', 'Peringatan '+n+' dari '+MAXV); var p=el('p','', 'Kamu berpindah tab atau aplikasi. Perpindahan dicatat dan dilihat pengajar. Jika terjadi satu kali lagi setelah '+MAXV+' peringatan, ujian terkunci dan jawabanmu dikirim otomatis.'); p.style.margin='8px 0 12px';
+  var ok=el('button','btn','Saya mengerti'); ok.type='button'; ok.addEventListener('click', function(){ m.remove(); });
+  b.appendChild(h); b.appendChild(p); b.appendChild(ok); m.appendChild(b); document.body.appendChild(m);
+}
+var VPENDING=0;
+document.addEventListener('visibilitychange', function(){
+  if(!S.sid || S.submitted) return;
+  if(document.hidden){
+    logEv('tab_hidden');
+    var n=vGet()+1; vSet(n);
+    if(n>MAXV){ logEv('locked'); try{ $('lock-note').classList.remove('hidden'); }catch(e){} finish(true,'lock'); }
+    else VPENDING=n;
+  } else if(VPENDING){ var k=VPENDING; VPENDING=0; vModal(k); }
+});
 window.addEventListener('blur', function(){ logEv('blur'); });
 
 window.addEventListener('beforeunload', function(e){ if(S.sid && !S.submitted){ e.preventDefault(); e.returnValue=''; } });
