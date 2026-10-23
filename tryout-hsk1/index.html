@@ -51,6 +51,7 @@ button{font:inherit;cursor:pointer}
 .opt .hz{font-size:21px;line-height:1.4}
 .opt .py{font-size:12.5px;color:var(--muted)}
 .pic{display:block;width:110px;max-width:100%;height:auto;border-radius:12px}
+.pic.stem{width:200px}
 .opt.picopt{align-items:center}
 .logo{display:block;height:44px;width:auto;margin:0 0 14px}
 .opt.sel{border-color:var(--green);background:var(--tint)}
@@ -274,7 +275,7 @@ function renderQ(i){
   if(q.sec==='T') card.appendChild(audioBlock(q.id));
 
   if(p.stem){
-    if(p.stem.img){ var si=el('img','pic stem'); si.src='img/'+p.stem.img+'.png'; si.alt='Gambar soal'; si.width=150; si.height=150; si.style.margin='4px 0 10px'; card.appendChild(si); }
+    if(p.stem.img){ var si=el('img','pic stem'); si.src='img/'+p.stem.img+'.png'; si.alt='Gambar soal'; si.style.margin='4px 0 10px'; card.appendChild(si); }
     else if(p.stem.plain) card.appendChild(el('div','plain',p.stem.plain));
     else p.stem.lines.forEach(function(ln,idx){
       var isLast=idx===p.stem.lines.length-1;
@@ -288,7 +289,7 @@ function renderQ(i){
     b.setAttribute('aria-pressed', cur===L?'true':'false');
     b.appendChild(el('span','L',L));
     var box=el('div');
-    if(o.img){ var im=el('img','pic'); im.src='img/'+o.img+'.png'; im.alt='Gambar '+L; im.width=110; im.height=110; box.appendChild(im); b.classList.add('picopt'); }
+    if(o.img){ var im=el('img','pic'); im.src='img/'+o.img+'.png'; im.alt='Gambar '+L; box.appendChild(im); b.classList.add('picopt'); }
     else if(o.plain) box.appendChild(el('div','hz',o.plain));
     else { box.appendChild(el('div','hz',o.lines[0].hanzi)); if(o.lines[0].py) box.appendChild(el('div','py',o.lines[0].py)); }
     b.appendChild(box);
