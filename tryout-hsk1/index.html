@@ -221,7 +221,7 @@ $('btn-start').addEventListener('click', function(){
 // ---------- Ujian ----------
 function secInfo(id){
   if(id>40) return { tag:'四、口语 Kouyu (Voice Note)', part:'Rekam voice note dalam bahasa Mandarin, maksimal 60 detik. Ceritakan dengan kalimat sederhana. Dinilai oleh Laoshi, terpisah dari soal 1–40.' };
-  if(id<=15) return { tag:'一、听力 Tingli', part: (id<=5 || id===10) ? 'Lihat gambar dan dengarkan kalimat. Pilih Benar (√) jika kalimat cocok dengan gambar, atau Salah (×) jika tidak cocok.' : 'Dengarkan dialog dan pertanyaan, lalu pilih jawaban.' };
+  if(id<=15) return { tag:'一、听力 Tingli', part: (id<=5 || id===10) ? 'Lihat gambar dan dengarkan cerita pendek beserta pertanyaannya. Pilih Benar (√) jika pertanyaan cocok dengan gambar, atau Salah (×) jika tidak cocok.' : 'Dengarkan dialog dan pertanyaan, lalu pilih jawaban.' };
   if(id<=30) return { tag:'二、阅读 Yuedu', part: id<=20 ? 'Baca kalimat, lalu pilih gambar yang cocok.' : (id<=25 ? 'Pilih jawaban yang cocok untuk kalimat.' : 'Baca teks pendek, lalu jawab pertanyaannya.') };
   return { tag:'三、书写 Shuxie', part: id<=35 ? 'Susun kata menjadi kalimat yang benar.' : 'Pilih tulisan (hanzi) atau kalimat yang benar.' };
 }
