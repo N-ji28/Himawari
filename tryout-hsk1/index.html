@@ -221,7 +221,7 @@ $('btn-start').addEventListener('click', function(){
 // ---------- Ujian ----------
 function secInfo(id){
   if(id>40) return { tag:'四、口语 Kouyu (Voice Note)', part:'Rekam voice note dalam bahasa Mandarin, maksimal 60 detik. Ceritakan dengan kalimat sederhana. Dinilai oleh Laoshi, terpisah dari soal 1–40.' };
-  if(id<=15) return { tag:'一、听力 Tingli', part: id<=5 ? 'Bagian 1: dengarkan kalimat. Soal 1 pilih kalimat yang sama; soal 2–5 pilih gambar yang cocok.' : 'Dengarkan dialog dan pertanyaan, lalu pilih jawaban.' };
+  if(id<=15) return { tag:'一、听力 Tingli', part: (id<=5 || id===10) ? 'Lihat gambar dan dengarkan kalimat. Pilih Benar (√) jika kalimat cocok dengan gambar, atau Salah (×) jika tidak cocok.' : 'Dengarkan dialog dan pertanyaan, lalu pilih jawaban.' };
   if(id<=30) return { tag:'二、阅读 Yuedu', part: id<=20 ? 'Baca kalimat, lalu pilih gambar yang cocok.' : (id<=25 ? 'Pilih jawaban yang cocok untuk kalimat.' : 'Baca teks pendek, lalu jawab pertanyaannya.') };
   return { tag:'三、书写 Shuxie', part: id<=35 ? 'Susun kata menjadi kalimat yang benar.' : 'Pilih tulisan (hanzi) atau kalimat yang benar.' };
 }
@@ -274,7 +274,8 @@ function renderQ(i){
   if(q.sec==='T') card.appendChild(audioBlock(q.id));
 
   if(p.stem){
-    if(p.stem.plain) card.appendChild(el('div','plain',p.stem.plain));
+    if(p.stem.img){ var si=el('img','pic stem'); si.src='img/'+p.stem.img+'.png'; si.alt='Gambar soal'; si.width=150; si.height=150; si.style.margin='4px 0 10px'; card.appendChild(si); }
+    else if(p.stem.plain) card.appendChild(el('div','plain',p.stem.plain));
     else p.stem.lines.forEach(function(ln,idx){
       var isLast=idx===p.stem.lines.length-1;
       card.appendChild(lineBlock(ln, p.kind==='baca' && !isLast));
