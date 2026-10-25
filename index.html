@@ -157,7 +157,8 @@ $('#qtype').addEventListener('change',start); $('#showpy').addEventListener('cha
 document.querySelectorAll('nav button').forEach(b=>b.addEventListener('click',()=>{mode=b.dataset.m;document.querySelectorAll('nav button').forEach(x=>x.setAttribute('aria-selected',x===b));start()}));
 const pool=a=>sel.value==='all'?a:a.filter(x=>x.c==+sel.value);
 function speak(t,r){try{const u=new SpeechSynthesisUtterance(t);u.lang='zh-CN';u.rate=r||.85;speechSynthesis.cancel();speechSynthesis.speak(u)}catch(e){}}
-const canSpeak=()=>'speechSynthesis' in window;
+let zhOK=true;const chkZh=()=>{try{const v=speechSynthesis.getVoices();if(v.length)zhOK=v.some(x=>/^zh/i.test(x.lang))}catch(e){}};chkZh();try{speechSynthesis.onvoiceschanged=chkZh}catch(e){}
+const canSpeak=()=>'speechSynthesis' in window&&zhOK;
 function hud(){const h=$('#hud');h.innerHTML='';
   const mk=(k,v,hot,svg)=>{const p=el('span','pill'+(hot?' hot':''));if(svg)p.insertAdjacentHTML('beforeend',FL);const w=el('span');w.append(el('small','',k+' '),Object.assign(el('b'),{textContent:v}));p.append(w);return p};
   h.append(mk('Poin',ls.pts,false),mk('Api',ls.flame,ls.flame>=3,true),mk('Hari beruntun',ls.days,false))}
@@ -323,8 +324,8 @@ const pyOf=s=>s.t.map(t=>t[1]).join(' ');
 /* ---- Pembantu soal (dipakai mode biasa dan Ruang Campur) ---- */
 const VOICE=()=>(vs&&vs.value)||'susan', pad2=n=>String(n).padStart(2,'0');
 function icoEl(n){const d=el('div','ico');d.style.setProperty('--c',n%10);d.style.setProperty('--r',Math.floor(n/10));d.setAttribute('role','img');d.setAttribute('aria-label','gambar benda');return d}
-function playSrc(src,fbText,slow){stopAudio();const a=new Audio(src);let fell=false;const fb=()=>{if(fell)return;fell=true;if(curAudio===a)curAudio=null;if(fbText)speak(fbText,slow?.55:undefined)};a.addEventListener('error',fb);if(slow)a.playbackRate=.75;curAudio=a;const p=a.play();if(p&&p.catch)p.catch(fb)}
-function playQ(Q,slow){if(Q.tn)playSrc('audio/tanya-'+VOICE()+'-'+pad2(Q.tn)+'.mp3',Q.say,slow);else if(Q.story)playSrc('audio/cerita-'+VOICE()+'-'+Q.story+'.mp3',Q.say,slow);else speak(Q.say,slow?.55:undefined)}
+function playSrc(src,fbText,slow){stopAudio();const a=new Audio(src);let fell=false;const fb=()=>{if(fell)return;fell=true;if(curAudio===a)curAudio=null;if(fbText&&canSpeak())speak(fbText,slow?.55:undefined);else pop('Suara tidak bisa diputar')};a.addEventListener('error',fb);if(slow)a.playbackRate=.75;curAudio=a;const p=a.play();if(p&&p.catch)p.catch(fb)}
+function playQ(Q,slow){if(Q.tn)playSrc('audio/tanya-'+VOICE()+'-'+pad2(Q.tn)+'.mp3',Q.say,slow);else if(Q.story)playSrc('audio/cerita-'+VOICE()+'-'+Q.story+'.mp3',Q.say,slow);else if(canSpeak())speak(Q.say,slow?.55:undefined);else pop('Perangkat ini tidak punya suara Mandarin')}
 const fbOf=x=>`${x.z} · ${x.p} · ${x.i}`;
 function picQ(x,kind,showPy){
   if(kind==='z'){const o=shuf([x,...shuf(PIC.filter(y=>y!==x)).slice(0,3)]);
@@ -333,12 +334,12 @@ function picQ(x,kind,showPy){
   return{tag:'Tebak gambar',img:x.n,sub:`Gambar ini: ${x.z}. Pilih pinyin yang benar.`,o:o.map(y=>({t:y.p})),ok:o.indexOf(x),fb:fbOf(x),rev:fbOf(x)}}
 function scQ(x,showPy){const o=shuf([x,...shuf(SC.filter(y=>y!==x)).slice(0,3)]);
   return{tag:'Tebak gambar',big:x.e,sub:'Kalimat mana yang cocok dengan gambar?',one:1,o:o.map(y=>({t:y.z,s:showPy?y.p:'',cls:'hz'})),ok:o.indexOf(x),fb:fbOf(x),rev:`${x.e} ${fbOf(x)}`}}
-function lsArtiQ(x){const o=shuf([x,...shuf(S.filter(y=>y!==x&&y.i!==x.i)).slice(0,3)]);
-  return{tag:'Mendengar',say:x.z,sub:'Dengarkan, lalu pilih artinya.',one:1,o:o.map(y=>({t:y.i})),ok:o.indexOf(x),fb:`${x.z} · ${pyOf(x)} · ${x.i}`,rev:`${x.z} · ${pyOf(x)} · ${x.i}`}}
+function lsArtiQ(r){const o=shuf([r,...shuf(LR.filter(y=>y!==r&&y.qi!==r.qi)).slice(0,3)]);
+  return{tag:'Mendengar',say:r.q,tn:r.n,sub:'Dengarkan, lalu pilih artinya.',one:1,o:o.map(y=>({t:y.qi})),ok:o.indexOf(r),fb:`${r.q} · ${r.qp} · ${r.qi}`,rev:`${r.q} · ${r.qp} · ${r.qi}`}}
 function lsLRQ(r,showPy){const a={t:r.a[0],s:showPy?r.a[1]:'',cls:'hz'};const o=shuf([a,...r.w.map(w=>({t:w[0],s:showPy?w[1]:'',cls:'hz'}))]);
   return{tag:'Mendengar',say:r.q,tn:r.n,sub:'Dengarkan pertanyaan, lalu pilih jawaban yang tepat.',one:1,o,ok:o.indexOf(a),fb:`${r.q} (${r.qi}) → ${r.a[0]} (${r.a[2]})`,rev:`${r.q} (${r.qi}) → ${r.a[0]} (${r.a[2]})`}}
-function lsSameQ(x,showPy){const o=shuf([x,...shuf(S.filter(y=>y!==x&&y.z!==x.z)).slice(0,3)]);
-  return{tag:'Mendengar',say:x.z,sub:'Kalimat mana yang kamu dengar?',one:1,o:o.map(y=>({t:y.z,s:showPy?pyOf(y):'',cls:'hz'})),ok:o.indexOf(x),fb:`${x.z} · ${x.i}`,rev:`${x.z} · ${pyOf(x)} · ${x.i}`}}
+function lsSameQ(r,showPy){const o=shuf([r,...shuf(LR.filter(y=>y!==r&&y.q!==r.q)).slice(0,3)]);
+  return{tag:'Mendengar',say:r.q,tn:r.n,sub:'Kalimat mana yang kamu dengar?',one:1,o:o.map(y=>({t:y.q,s:showPy?y.qp:'',cls:'hz'})),ok:o.indexOf(r),fb:`${r.q} · ${r.qi}`,rev:`${r.q} · ${r.qp} · ${r.qi}`}}
 function storyQs(st,noSay){const say=st.z.map(x=>x[0]).join('');return st.q.map(([q,opts,ok],k)=>{const o=opts.map((t,i)=>({t,i}));const sh=shuf(o);
   const Q={tag:'Cerita',sub:q,one:1,o:sh.map(x=>({t:x.t})),ok:sh.findIndex(x=>x.i===ok),fb:`Jawaban: ${opts[ok]}`,rev:`${q} → ${opts[ok]}`};
   if(!noSay){Q.say=say;Q.story=st.n;Q.sub=`Dengarkan ceritanya. ${q}`;if(k>0)Q.noauto=true}return Q})}
@@ -354,11 +355,9 @@ function pic(){
   runSet('Tebak gambar',shuf(qs))}
 /* ---- Dengar ---- */
 function listen(){
-  const showPy=$('#showpy').checked,P=pool(S).length>=4?pool(S):S,qs=[];
-  fresh(P,'ls-a',4).forEach(x=>qs.push(lsArtiQ(x)));
-  fresh(LR,'lr',4).forEach(r=>qs.push(lsLRQ(r,showPy)));
-  fresh(P,'ls-p',2).forEach(x=>qs.push(lsSameQ(x,showPy)));
-  runSet('Latihan mendengar',shuf(qs))}
+  const showPy=$('#showpy').checked,items=fresh(LR,'ls',10),fm=shuf(['a','a','a','a','s','s','s','t','t','t']);
+  const qs=items.map((r,i)=>fm[i]==='a'?lsLRQ(r,showPy):fm[i]==='s'?lsSameQ(r,showPy):lsArtiQ(r));
+  runSet('Latihan mendengar',qs)}
 /* ---- Ruang Campur: semua jenis soal dalam satu ronde ---- */
 function room(){
   const showPy=$('#showpy').checked,types=['arti','hanzi','pinyin'],qs=[];
@@ -369,9 +368,7 @@ function room(){
     else qs.push({...base,han:w.h,sub:ty==='pinyin'?'Pilih pinyin yang tepat':(showPy?w.p+' · pilih arti yang tepat':'Pilih arti yang tepat'),o:o.map(y=>({t:ty==='pinyin'?y.p:y.i}))})});
   fresh(PIC,'room-p',3).forEach((x,i)=>qs.push(picQ(x,i<2?'z':'p',showPy)));
   fresh(SC,'room-sc',2).forEach(x=>qs.push(scQ(x,showPy)));
-  fresh(S,'room-la',2).forEach(x=>qs.push(lsArtiQ(x)));
-  fresh(LR,'room-lr',3).forEach(r=>qs.push(lsLRQ(r,showPy)));
-  fresh(S,'room-ls',2).forEach(x=>qs.push(lsSameQ(x,showPy)));
+  {const it=fresh(LR,'room-lr',7);it.forEach((r,i)=>qs.push(i<3?lsLRQ(r,showPy):i<5?lsArtiQ(r):lsSameQ(r,showPy)))}
   fresh(S,'room-s',2).forEach(x=>qs.push(sentQ(x)));
   const list=shuf(qs),block=storyQs(fresh(ST,'room-st',1)[0]);
   list.splice(Math.floor(Math.random()*(list.length+1)),0,...block);
