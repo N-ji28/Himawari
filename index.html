@@ -343,10 +343,11 @@ function lsSameQ(r,showPy){const o=shuf([r,...shuf(LR.filter(y=>y!==r&&y.q!==r.q
 function storyQs(st,noSay){const say=st.z.map(x=>x[0]).join('');return st.q.map(([q,opts,ok],k)=>{const o=opts.map((t,i)=>({t,i}));const sh=shuf(o);
   const Q={tag:'Cerita',sub:q,one:1,o:sh.map(x=>({t:x.t})),ok:sh.findIndex(x=>x.i===ok),fb:`Jawaban: ${opts[ok]}`,rev:`${q} → ${opts[ok]}`};
   if(!noSay){Q.say=say;Q.story=st.n;Q.sub=`Dengarkan ceritanya. ${q}`;if(k>0)Q.noauto=true}return Q})}
-function sentQ(x){const want=x.t.map(t=>t[0]).join('');const seen=new Set([want]),wr=[];let g=0;
-  while(wr.length<3&&g++<60){const p=shuf(x.t).map(t=>t[0]).join('');if(!seen.has(p)){seen.add(p);wr.push(p)}}
-  const o=shuf([want,...wr]);const tk=shuf(x.t).map(t=>t[0]).join('  /  ');
-  return{tag:'Susun kalimat',sub:`Susun kata ini menjadi kalimat yang benar: ${tk}`,one:1,o:o.map(t=>({t,cls:'hz'})),ok:o.indexOf(want),fb:`${x.z} · ${pyOf(x)} · ${x.i}`,rev:`${x.z} · ${pyOf(x)} · ${x.i}`}}
+function sentQ(x){const key=a=>a.map(t=>t[0]).join('');const want=key(x.t),seen=new Set([want]),wr=[];let g=0;
+  while(wr.length<3&&g++<80){const p=shuf(x.t);const k=key(p);if(!seen.has(k)){seen.add(k);wr.push(p)}}
+  const o=shuf([x.t,...wr]),ok=o.findIndex(a=>key(a)===want);
+  const tk=shuf(x.t).map(t=>`${t[0]} (${t[1]})`).join('  /  ');
+  return{tag:'Susun kalimat',sub:`Susun kata ini menjadi kalimat yang benar: ${tk}`,one:1,o:o.map(a=>({t:key(a),s:a.map(t=>t[1]).join(' '),cls:'hz'})),ok,fb:`${x.z} · ${pyOf(x)} · ${x.i}`,rev:`${x.z} · ${pyOf(x)} · ${x.i}`}}
 /* ---- Gambar ---- */
 function pic(){
   const showPy=$('#showpy').checked,qs=[];
