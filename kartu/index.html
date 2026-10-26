@@ -147,8 +147,8 @@ function render(){
   const spk=`<button class="spk" id="spk" aria-label="Dengarkan pengucapan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/></svg></button>`;
   const fs=w.h.length<=3?110:w.h.length<=5?84:w.h.length<=8?60:44;
   if(mode===0){
-    $('front').innerHTML=tag+spk+`<div class="hz" style="font-size:${fs}px">${esc(w.h)}</div><div class="py">${esc(w.p)}</div><div class="hint">Ketuk untuk lihat arti</div>`;
-    $('back').innerHTML=tag+`<div class="ar">${esc(w.a)}</div><div class="sub"><span class="hz" style="font-size:28px">${esc(w.h)}</span> · ${esc(w.p)}</div>`;
+    $('front').innerHTML=tag+spk+`<div class="hz" style="font-size:${fs}px">${esc(w.h)}</div><div class="hint">Ketuk untuk lihat pinyin dan arti</div>`;
+    $('back').innerHTML=tag+spk+`<div class="py" style="font-size:42px">${esc(w.p)}</div><div class="ar">${esc(w.a)}</div><div class="sub"><span class="hz" style="font-size:30px">${esc(w.h)}</span></div>`;
   }else{
     $('front').innerHTML=tag+`<div class="sub">Apa pinyin-nya?</div><div class="ar">${esc(w.a)}</div><div class="hint">Ketuk untuk lihat jawaban</div>`;
     $('back').innerHTML=tag+spk+`<div class="py" style="font-size:42px">${esc(w.p)}</div><div class="hz" style="font-size:${Math.min(fs,84)}px">${esc(w.h)}</div><div class="sub">${esc(w.a)}</div>`;
