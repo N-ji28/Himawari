@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Kartu Kosakata HIMAWARI</title>
+<meta name="theme-color" content="#2B4A3E">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;700;800&family=Noto+Sans+SC:wght@500;700;900&display=swap">
+<style>
+:root{--g:#2B4A3E;--g2:#4A7C59;--br:#6B4E37;--oc:#A3761F;--gold:#D9A62E;--cream:#FAF7F2;--card:#FFFFFF;--line:#E6DEC8;--ink:#222;--mut:#6b6558;--bad:#C2512B}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0}
+body{font-family:'Nunito Sans','Noto Sans SC',system-ui,sans-serif;background:var(--cream);color:var(--ink);min-height:100vh;padding-bottom:40px}
+header{background:var(--g);padding:14px 16px 18px;border-bottom:6px solid var(--gold)}
+.hd{max-width:560px;margin:0 auto;display:flex;align-items:center;gap:12px}
+.hd img{height:44px;border-radius:12px;background:var(--cream);padding:4px 8px}
+.hd h1{margin:0;font-size:20px;color:#fff;font-weight:800;line-height:1.15}
+.hd small{display:block;color:#CFE0D4;font-weight:400;font-size:13px;margin-top:2px}
+main{max-width:560px;margin:0 auto;padding:16px}
+.lbl{font-size:12px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--oc);margin:14px 0 6px}
+.chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;scrollbar-width:thin}
+.chip{flex:none;border:2px solid var(--line);background:#fff;color:var(--g);font:inherit;font-weight:800;font-size:14px;padding:8px 14px;border-radius:999px;cursor:pointer}
+.chip.on{background:var(--g);border-color:var(--g);color:#fff}
+.chtitle{margin:8px 0 0;font-size:15px;color:var(--mut)}
+.chtitle b{color:var(--g)}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.seg{display:flex;border:2px solid var(--line);border-radius:999px;overflow:hidden;background:#fff}
+.seg button{border:0;background:none;font:inherit;font-weight:800;font-size:14px;padding:8px 14px;color:var(--g);cursor:pointer}
+.seg button.on{background:var(--g);color:#fff}
+.tg{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;color:var(--g);cursor:pointer;user-select:none}
+.tg input{width:18px;height:18px;accent-color:var(--g2)}
+.prog{margin:12px 0 8px;display:flex;justify-content:space-between;font-size:14px;font-weight:700;color:var(--g)}
+.bar{height:10px;border-radius:99px;background:var(--line);overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--g2);transition:width .25s}
+.stage{perspective:1400px;margin:12px 0 10px}
+.card{position:relative;height:min(48vh,360px);min-height:270px;cursor:pointer;transform-style:preserve-3d;transition:transform .45s cubic-bezier(.3,.7,.2,1)}
+.card.flip{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;background:var(--card);border:2px solid var(--line);border-bottom:12px solid var(--g);border-radius:32px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:22px;text-align:center}
+.back{transform:rotateY(180deg);border-bottom-color:var(--gold);background:#FFFBEF}
+.tag{position:absolute;top:14px;left:18px;font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#fff;background:var(--g2);padding:4px 12px;border-radius:99px}
+.tag.tb{background:var(--oc)}
+.hz{font-family:'Noto Sans SC','Nunito Sans',sans-serif;font-weight:900;color:var(--g);line-height:1.1}
+.py{font-weight:800;color:var(--oc);font-size:30px}
+.ar{font-weight:800;color:var(--g);font-size:34px;line-height:1.2}
+.hint{position:absolute;bottom:16px;font-size:13px;color:var(--mut)}
+.sub{font-size:16px;color:var(--mut)}
+.spk{position:absolute;top:10px;right:12px;border:0;background:var(--cream);border-radius:50%;width:46px;height:46px;display:grid;place-items:center;cursor:pointer;color:var(--g)}
+.spk svg{width:24px;height:24px}
+.nav{display:flex;gap:10px}
+.nav button{font:inherit;font-weight:800;font-size:16px;border-radius:18px;padding:14px 12px;cursor:pointer;border:2px solid var(--line);background:#fff;color:var(--g)}
+.nav .ic{width:56px}
+.nav .bad{flex:1;border-color:var(--bad);color:var(--bad)}
+.nav .ok{flex:1;background:var(--g2);border-color:var(--g2);color:#fff}
+.tools{margin-top:14px;display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center}
+.lnk{border:0;background:none;font:inherit;font-weight:700;font-size:14px;color:var(--g);text-decoration:underline;cursor:pointer;padding:6px 2px}
+.done{display:none;text-align:center;background:#fff;border:2px solid var(--line);border-bottom:12px solid var(--gold);border-radius:32px;padding:32px 20px;margin:16px 0}
+.done h2{margin:0 0 6px;color:var(--g)}
+.done p{margin:0 0 16px;color:var(--mut)}
+.btn{font:inherit;font-weight:800;background:var(--g);color:#fff;border:0;border-radius:999px;padding:12px 24px;cursor:pointer}
+footer{max-width:560px;margin:18px auto 0;padding:0 16px;font-size:12px;color:var(--mut);text-align:center}
+@media (prefers-reduced-motion:reduce){.card{transition:none}}
+</style>
+</head>
+<body>
+<header><div class="hd"><img src="logo.png" alt="HIMAWARI Mandarin Learning"><h1>Kartu Kosakata<small>你好，中文！(Nǐ hǎo, Zhōngwén!) Lanjutan · HSK 3.0 tingkat 2–3</small></h1></div></header>
+<main>
+<div class="lbl">Pilih bab</div>
+<div class="chips" id="chips"></div>
+<p class="chtitle" id="chtitle"></p>
+
+<div class="lbl">Cara belajar</div>
+<div class="row">
+ <div class="seg" id="mode"><button data-m="0" class="on">Hanzi → Arti</button><button data-m="1">Arti → Pinyin</button></div>
+</div>
+<details style="margin-top:8px"><summary class="lnk" style="cursor:pointer">Opsi lain (kata tambahan, acak, belum hafal)</summary>
+<div class="row" style="margin-top:8px">
+ <label class="tg"><input type="checkbox" id="extra" checked> Sertakan kata tambahan</label>
+ <label class="tg"><input type="checkbox" id="only"> Hanya yang belum hafal</label>
+ <label class="tg"><input type="checkbox" id="shuf"> Acak</label>
+</div></details>
+
+<div class="prog"><span id="pos">Kartu 0/0</span><span id="hafal">Hafal 0</span></div>
+<div class="bar"><i id="pb"></i></div>
+
+<div class="stage" id="stage">
+ <div class="card" id="card" role="button" tabindex="0" aria-label="Kartu kosakata, ketuk untuk membalik">
+  <div class="face front" id="front"></div>
+  <div class="face back" id="back"></div>
+ </div>
+</div>
+<div class="done" id="done"><h2>Selesai untuk pilihan ini</h2><p id="donetxt"></p><button class="btn" id="again">Ulangi dari awal</button></div>
+
+<div class="nav" id="nav">
+ <button class="ic" id="prev" aria-label="Kartu sebelumnya">&#8592;</button>
+ <button class="bad" id="bad">Belum hafal</button>
+ <button class="ok" id="ok">Hafal</button>
+ <button class="ic" id="next" aria-label="Kartu berikutnya">&#8594;</button>
+</div>
+<div class="tools">
+ <span style="font-size:13px;color:var(--mut)">Ketuk kartu untuk membalik. Geser kiri/kanan untuk pindah kartu.</span>
+ <button class="lnk" id="reset">Hapus progres hafalan</button>
+</div>
+</main>
+<footer>HIMAWARI 向日葵中文 (Xiàngrìkuí Zhōngwén) · progres hafalan tersimpan di browser ini saja</footer>
+
+<script>
+const DATA=[{"n":1,"h":"我的一天","py":"wǒ de yì tiān","t":"Jadwal & Kebiasaan Harian","w":[{"h":"一般","p":"yìbān","a":"umumnya","t":"inti"},{"h":"经常","p":"jīngcháng","a":"sering","t":"inti"},{"h":"有时候","p":"yǒushíhòu","a":"kadang-kadang","t":"inti"},{"h":"已经","p":"yǐjīng","a":"sudah","t":"inti"},{"h":"才","p":"cái","a":"baru (lebih lambat)","t":"inti"},{"h":"就","p":"jiù","a":"sudah / langsung (cepat)","t":"inti"},{"h":"习惯","p":"xíguàn","a":"kebiasaan","t":"inti"},{"h":"开始","p":"kāishǐ","a":"mulai","t":"inti"},{"h":"结束","p":"jiéshù","a":"selesai (acara)","t":"inti"},{"h":"准备","p":"zhǔnbèi","a":"bersiap","t":"inti"},{"h":"迟到","p":"chídào","a":"terlambat","t":"inti"},{"h":"马上","p":"mǎshàng","a":"segera","t":"inti"},{"h":"洗澡","p":"xǐzǎo","a":"mandi","t":"inti"},{"h":"着急","p":"zháojí","a":"buru-buru / cemas","t":"inti"}]},{"n":2,"h":"点菜和外卖","py":"diǎncài hé wàimài","t":"Memesan Makanan di Warung, Restoran & Aplikasi","w":[{"h":"点菜","p":"diǎncài","a":"memesan makanan","t":"inti"},{"h":"菜单","p":"càidān","a":"menu","t":"inti"},{"h":"辣","p":"là","a":"pedas","t":"inti"},{"h":"放","p":"fàng","a":"menaruh / membubuhkan","t":"inti"},{"h":"份","p":"fèn","a":"porsi (kata bantu)","t":"inti"},{"h":"碗","p":"wǎn","a":"mangkuk (kata bantu)","t":"inti"},{"h":"杯","p":"bēi","a":"gelas (kata bantu)","t":"inti"},{"h":"打包","p":"dǎbāo","a":"bungkus / bawa pulang","t":"inti"},{"h":"外卖","p":"wàimài","a":"pesan-antar","t":"inti"},{"h":"送","p":"sòng","a":"mengantar","t":"inti"},{"h":"地址","p":"dìzhǐ","a":"alamat","t":"inti"},{"h":"推荐","p":"tuījiàn","a":"merekomendasikan","t":"inti"},{"h":"味道","p":"wèidào","a":"rasa","t":"inti"},{"h":"还是","p":"háishi","a":"atau (dalam pertanyaan)","t":"inti"}]},{"n":3,"h":"出行和堵车","py":"chūxíng hé dǔchē","t":"Transportasi, Jarak & Macet","w":[{"h":"堵车","p":"dǔchē","a":"macet","t":"inti"},{"h":"骑","p":"qí","a":"mengendarai (motor/sepeda)","t":"inti"},{"h":"地铁","p":"dìtiě","a":"kereta bawah tanah / MRT","t":"inti"},{"h":"机场","p":"jīchǎng","a":"bandara","t":"inti"},{"h":"司机","p":"sījī","a":"pengemudi","t":"inti"},{"h":"上车","p":"shàngchē","a":"naik kendaraan","t":"inti"},{"h":"下车","p":"xiàchē","a":"turun dari kendaraan","t":"inti"},{"h":"需要","p":"xūyào","a":"membutuhkan (waktu/hal)","t":"inti"},{"h":"多久","p":"duōjiǔ","a":"berapa lama","t":"inti"},{"h":"从","p":"cóng","a":"dari","t":"inti"},{"h":"离","p":"lí","a":"berjarak dari","t":"inti"},{"h":"远","p":"yuǎn","a":"jauh","t":"inti"},{"h":"近","p":"jìn","a":"dekat","t":"inti"},{"h":"方便","p":"fāngbiàn","a":"praktis / nyaman","t":"inti"},{"h":"一直","p":"yìzhí","a":"terus (tanpa berhenti)","t":"tambahan"},{"h":"红绿灯","p":"hónglǜdēng","a":"lampu lalu lintas","t":"tambahan"},{"h":"平时","p":"píngshí","a":"biasanya (hari biasa)","t":"tambahan"},{"h":"行李","p":"xínglǐ","a":"bagasi / barang bawaan","t":"tambahan"},{"h":"主意","p":"zhǔyì","a":"ide / usul","t":"tambahan"},{"h":"打车","p":"dǎchē","a":"naik taksi/ojek online","t":"tambahan"},{"h":"动","p":"dòng","a":"bergerak","t":"tambahan"},{"h":"前面","p":"qiánmian","a":"di depan","t":"tambahan"},{"h":"站","p":"zhàn","a":"stasiun / halte","t":"tambahan"},{"h":"告诉","p":"gàosù","a":"memberi tahu","t":"tambahan"},{"h":"出发","p":"chūfā","a":"berangkat","t":"tambahan"}]},{"n":4,"h":"买东西和付款","py":"mǎi dōngxi hé fùkuǎn","t":"Belanja, Tawar Harga & Bayar (Tunai, QRIS, Transfer)","w":[{"h":"打折","p":"dǎzhé","a":"diskon","t":"inti"},{"h":"优惠","p":"yōuhuì","a":"promo / potongan harga","t":"inti"},{"h":"扫码","p":"sǎomǎ","a":"pindai kode QR","t":"inti"},{"h":"二维码","p":"èrwéimǎ","a":"kode QR","t":"inti"},{"h":"付款","p":"fùkuǎn","a":"membayar","t":"inti"},{"h":"转账","p":"zhuǎnzhàng","a":"transfer","t":"inti"},{"h":"现金","p":"xiànjīn","a":"uang tunai","t":"inti"},{"h":"合适","p":"héshì","a":"pas / cocok","t":"inti"},{"h":"试","p":"shì","a":"mencoba","t":"inti"},{"h":"件","p":"jiàn","a":"potong (kata bantu pakaian)","t":"inti"},{"h":"打九折","p":"dǎjiǔzhé","a":"diskon 10% (bayar 90%)","t":"inti"},{"h":"打八折","p":"dǎbāzhé","a":"diskon 20% (bayar 80%)","t":"inti"},{"h":"零钱","p":"língqián","a":"uang receh","t":"tambahan"},{"h":"收据","p":"shōujù","a":"struk / bukti bayar","t":"tambahan"},{"h":"换","p":"huàn","a":"menukar / mengganti","t":"tambahan"},{"h":"退","p":"tuì","a":"mengembalikan (barang)","t":"tambahan"},{"h":"质量","p":"zhìliàng","a":"kualitas","t":"tambahan"},{"h":"颜色","p":"yánsè","a":"warna","t":"tambahan"},{"h":"当然","p":"dāngrán","a":"tentu saja","t":"tambahan"},{"h":"成功","p":"chénggōng","a":"berhasil","t":"tambahan"},{"h":"衣服","p":"yīfu","a":"pakaian","t":"tambahan"},{"h":"用","p":"yòng","a":"memakai","t":"tambahan"},{"h":"付","p":"fù","a":"membayar","t":"tambahan"},{"h":"扫","p":"sǎo","a":"memindai","t":"tambahan"},{"h":"这样","p":"zhèyàng","a":"begini","t":"tambahan"},{"h":"试衣间","p":"shìyījiān","a":"ruang ganti","t":"tambahan"}]},{"n":6,"h":"朋友和周末","py":"péngyou hé zhōumò","t":"Mengajak, Berjanji & Bicara Hobi","w":[{"h":"约","p":"yuē","a":"mengajak janjian","t":"inti"},{"h":"有空","p":"yǒukòng","a":"punya waktu luang","t":"inti"},{"h":"一边","p":"yìbiān","a":"sambil (一边……一边…… (yìbiān … yìbiān …))","t":"inti"},{"h":"觉得","p":"juéde","a":"merasa / berpendapat","t":"inti"},{"h":"其实","p":"qíshí","a":"sebenarnya","t":"inti"},{"h":"特别","p":"tèbié","a":"sangat / istimewa","t":"inti"},{"h":"爱好","p":"àihào","a":"hobi","t":"inti"},{"h":"羽毛球","p":"yǔmáoqiú","a":"bulu tangkis","t":"inti"},{"h":"参加","p":"cānjiā","a":"ikut / berpartisipasi","t":"inti"},{"h":"聚会","p":"jùhuì","a":"kumpul-kumpul","t":"tambahan"},{"h":"介绍","p":"jièshào","a":"memperkenalkan","t":"tambahan"},{"h":"自己","p":"zìjǐ","a":"diri sendiri","t":"tambahan"},{"h":"活动","p":"huódòng","a":"kegiatan","t":"tambahan"},{"h":"邀请","p":"yāoqǐng","a":"mengundang","t":"tambahan"},{"h":"球场","p":"qiúchǎng","a":"lapangan olahraga","t":"tambahan"},{"h":"旁边","p":"pángbiān","a":"di samping","t":"tambahan"},{"h":"火锅","p":"huǒguō","a":"hot pot","t":"tambahan"},{"h":"打","p":"dǎ","a":"bermain (bola) / memukul","t":"tambahan"},{"h":"球","p":"qiú","a":"bola","t":"tambahan"},{"h":"关系","p":"guānxi","a":"hubungan (没关系 (méi guānxi) = tidak apa-apa)","t":"tambahan"},{"h":"带","p":"dài","a":"membawa","t":"tambahan"},{"h":"运动","p":"yùndòng","a":"olahraga","t":"tambahan"},{"h":"重要","p":"zhòngyào","a":"penting","t":"tambahan"},{"h":"一起","p":"yìqǐ","a":"bersama","t":"tambahan"},{"h":"可惜","p":"kěxī","a":"sayang sekali","t":"tambahan"},{"h":"一定","p":"yídìng","a":"pasti","t":"tambahan"},{"h":"好久不见","p":"hǎojiǔ bújiàn","a":"lama tidak jumpa","t":"tambahan"},{"h":"最近","p":"zuìjìn","a":"belakangan ini","t":"tambahan"}]},{"n":7,"h":"在办公室","py":"zài bàngōngshì","t":"Kantor: Rapat, Laporan & Izin","w":[{"h":"经理","p":"jīnglǐ","a":"manajer","t":"inti"},{"h":"同事","p":"tóngshì","a":"rekan kerja","t":"inti"},{"h":"请假","p":"qǐngjià","a":"mengajukan izin","t":"inti"},{"h":"安排","p":"ānpái","a":"mengatur / jadwal","t":"inti"},{"h":"完成","p":"wánchéng","a":"menyelesaikan","t":"inti"},{"h":"帮忙","p":"bāngmáng","a":"membantu","t":"inti"},{"h":"麻烦","p":"máfan","a":"merepotkan / tolong","t":"inti"},{"h":"报告","p":"bàogào","a":"laporan","t":"inti"},{"h":"开会","p":"kāihuì","a":"rapat","t":"inti"},{"h":"通知","p":"tōngzhī","a":"pemberitahuan / memberi tahu","t":"tambahan"},{"h":"文件","p":"wénjiàn","a":"dokumen","t":"tambahan"},{"h":"邮件","p":"yóujiàn","a":"email","t":"tambahan"},{"h":"打印","p":"dǎyìn","a":"mencetak","t":"tambahan"},{"h":"让","p":"ràng","a":"menyuruh / membiarkan","t":"tambahan"},{"h":"发","p":"fā","a":"mengirim","t":"tambahan"},{"h":"忘","p":"wàng","a":"lupa","t":"tambahan"},{"h":"事情","p":"shìqing","a":"urusan / hal","t":"tambahan"},{"h":"刚","p":"gāng","a":"baru saja","t":"tambahan"},{"h":"完","p":"wán","a":"selesai (penanda hasil)","t":"tambahan"},{"h":"帮","p":"bāng","a":"membantu","t":"tambahan"},{"h":"快要……了","p":"kuàiyào … le","a":"hampir / sebentar lagi","t":"tambahan"}]},{"n":8,"h":"上课和学习","py":"shàngkè hé xuéxí","t":"Kelas, Kursus & Bertanya Saat Belum Paham","w":[{"h":"复习","p":"fùxí","a":"mengulang pelajaran","t":"inti"},{"h":"作业","p":"zuòyè","a":"tugas / PR","t":"inti"},{"h":"考试","p":"kǎoshì","a":"ujian","t":"inti"},{"h":"练习","p":"liànxí","a":"latihan","t":"inti"},{"h":"听懂","p":"tīngdǒng","a":"mendengar dan paham","t":"inti"},{"h":"记住","p":"jìzhù","a":"mengingat","t":"inti"},{"h":"进步","p":"jìnbù","a":"kemajuan","t":"inti"},{"h":"努力","p":"nǔlì","a":"rajin / berusaha","t":"inti"},{"h":"认真","p":"rènzhēn","a":"sungguh-sungguh","t":"inti"},{"h":"问题","p":"wèntí","a":"pertanyaan / masalah","t":"inti"},{"h":"意思","p":"yìsi","a":"arti","t":"inti"},{"h":"句子","p":"jùzi","a":"kalimat","t":"inti"},{"h":"发音","p":"fāyīn","a":"pelafalan","t":"inti"},{"h":"一遍","p":"yí biàn","a":"satu kali penuh","t":"inti"},{"h":"预习","p":"yùxí","a":"mempelajari lebih dulu","t":"tambahan"},{"h":"回答","p":"huídá","a":"menjawab","t":"tambahan"},{"h":"笔记","p":"bǐjì","a":"catatan","t":"tambahan"},{"h":"清楚","p":"qīngchu","a":"jelas","t":"tambahan"},{"h":"慢","p":"màn","a":"lambat","t":"tambahan"},{"h":"借","p":"jiè","a":"meminjam / meminjamkan","t":"tambahan"},{"h":"教","p":"jiào","a":"mengajar","t":"tambahan"},{"h":"得","p":"de","a":"partikel penilaian cara","t":"tambahan"},{"h":"懂","p":"dǒng","a":"paham","t":"tambahan"},{"h":"语法","p":"yǔfǎ","a":"tata bahasa","t":"tambahan"},{"h":"词","p":"cí","a":"kata","t":"tambahan"},{"h":"每","p":"měi","a":"setiap","t":"tambahan"}]},{"n":9,"h":"身体不舒服","py":"shēntǐ bù shūfu","t":"Kesehatan: Gejala, Dokter & Obat","w":[{"h":"感冒","p":"gǎnmào","a":"flu / pilek","t":"inti"},{"h":"发烧","p":"fāshāo","a":"demam","t":"inti"},{"h":"头疼","p":"tóuténg","a":"sakit kepala","t":"inti"},{"h":"咳嗽","p":"késou","a":"batuk","t":"inti"},{"h":"药","p":"yào","a":"obat","t":"inti"},{"h":"医院","p":"yīyuàn","a":"rumah sakit","t":"inti"},{"h":"舒服","p":"shūfu","a":"nyaman / enak badan","t":"inti"},{"h":"吃药","p":"chīyào","a":"minum obat","t":"inti"},{"h":"次","p":"cì","a":"kali (kata bantu frekuensi)","t":"inti"},{"h":"注意","p":"zhùyì","a":"memperhatikan / waspada","t":"inti"},{"h":"多","p":"duō","a":"banyak / lebih","t":"inti"},{"h":"少","p":"shǎo","a":"sedikit / kurang","t":"inti"},{"h":"水","p":"shuǐ","a":"air","t":"inti"},{"h":"药店","p":"yàodiàn","a":"apotek","t":"tambahan"},{"h":"检查","p":"jiǎnchá","a":"memeriksa","t":"tambahan"},{"h":"严重","p":"yánzhòng","a":"parah","t":"tambahan"},{"h":"身体","p":"shēntǐ","a":"tubuh / kesehatan","t":"tambahan"},{"h":"饭后","p":"fànhòu","a":"setelah makan","t":"tambahan"},{"h":"好得快","p":"hǎo de kuài","a":"cepat sembuh","t":"tambahan"},{"h":"可能","p":"kěnéng","a":"mungkin","t":"tambahan"},{"h":"头","p":"tóu","a":"kepala","t":"tambahan"},{"h":"疼","p":"téng","a":"sakit / nyeri","t":"tambahan"},{"h":"好好","p":"hǎohāo","a":"dengan sungguh-sungguh / baik-baik","t":"tambahan"},{"h":"片","p":"piàn","a":"tablet (kata bantu)","t":"tambahan"},{"h":"累","p":"lèi","a":"capek","t":"tambahan"}]},{"n":11,"h":"电话和消息","py":"diànhuà hé xiāoxī","t":"Telepon, WhatsApp & Menyampaikan Pesan","w":[{"h":"喂","p":"wèi","a":"halo (di telepon)","t":"inti"},{"h":"在吗","p":"zài ma","a":"ada di tempat? / bisa bicara?","t":"inti"},{"h":"听清楚","p":"tīngqīngchǔ","a":"mendengar dengan jelas","t":"inti"},{"h":"稍等","p":"shāoděng","a":"tunggu sebentar","t":"inti"},{"h":"回电话","p":"huí diànhuà","a":"menelepon balik","t":"inti"},{"h":"消息","p":"xiāoxī","a":"pesan / kabar","t":"inti"},{"h":"转告","p":"zhuǎngào","a":"menyampaikan","t":"inti"},{"h":"给","p":"gěi","a":"kepada / memberi","t":"inti"},{"h":"一会儿","p":"yíhuìr","a":"sebentar","t":"inti"},{"h":"正在","p":"zhèngzài","a":"sedang","t":"inti"},{"h":"打错","p":"dǎcuò","a":"salah sambung","t":"tambahan"},{"h":"信号","p":"xìnhào","a":"sinyal","t":"tambahan"},{"h":"留言","p":"liúyán","a":"meninggalkan pesan","t":"tambahan"},{"h":"语音","p":"yǔyīn","a":"pesan suara","t":"tambahan"},{"h":"联系","p":"liánxì","a":"menghubungi","t":"tambahan"},{"h":"接","p":"jiē","a":"mengangkat / menerima","t":"tambahan"},{"h":"哪位","p":"nǎwèi","a":"siapa (sopan, di telepon)","t":"tambahan"},{"h":"接线员","p":"jiēxiànyuán","a":"operator / resepsionis telepon","t":"tambahan"},{"h":"包","p":"bāo","a":"tas","t":"tambahan"},{"h":"号码","p":"hàomǎ","a":"nomor","t":"tambahan"}]},{"n":12,"h":"租房和搬家","py":"zū fáng hé bānjiā","t":"Mencari Kos & Kontrakan","w":[{"h":"租","p":"zū","a":"menyewa","t":"inti"},{"h":"房租","p":"fángzū","a":"uang sewa","t":"inti"},{"h":"房间","p":"fángjiān","a":"kamar","t":"inti"},{"h":"空调","p":"kōngtiáo","a":"AC","t":"inti"},{"h":"干净","p":"gānjìng","a":"bersih","t":"inti"},{"h":"安静","p":"ānjìng","a":"tenang","t":"inti"},{"h":"搬","p":"bān","a":"pindah / mengangkut","t":"inti"},{"h":"包括","p":"bāokuò","a":"termasuk","t":"inti"},{"h":"附近","p":"fùjìn","a":"sekitar / dekat sini","t":"inti"},{"h":"比较","p":"bǐjiào","a":"cukup / relatif","t":"inti"},{"h":"每个月","p":"měigèyuè","a":"setiap bulan","t":"inti"},{"h":"房东","p":"fángdōng","a":"pemilik kos / rumah","t":"tambahan"},{"h":"押金","p":"yājīn","a":"uang jaminan","t":"tambahan"},{"h":"邻居","p":"línjū","a":"tetangga","t":"tambahan"},{"h":"合同","p":"hétóng","a":"kontrak","t":"tambahan"},{"h":"签","p":"qiān","a":"menandatangani","t":"tambahan"},{"h":"水电费","p":"shuǐdiànfèi","a":"biaya air dan listrik","t":"tambahan"},{"h":"另外","p":"lìngwài","a":"terpisah / lagi pula","t":"tambahan"},{"h":"摩托车","p":"mótuōchē","a":"sepeda motor","t":"tambahan"},{"h":"算","p":"suàn","a":"menghitung","t":"tambahan"},{"h":"进","p":"jìn","a":"masuk","t":"tambahan"},{"h":"走","p":"zǒu","a":"pergi / berjalan","t":"tambahan"},{"h":"进来","p":"jìnlai","a":"masuk (ke sini)","t":"tambahan"},{"h":"考虑","p":"kǎolǜ","a":"mempertimbangkan","t":"tambahan"},{"h":"搬家","p":"bānjiā","a":"pindahan","t":"tambahan"}]},{"n":13,"h":"快递和银行","py":"kuàidì hé yínháng","t":"Paket, Kantor Pos & Bank","w":[{"h":"快递","p":"kuàidì","a":"kurir / paket ekspres","t":"inti"},{"h":"包裹","p":"bāoguǒ","a":"paket / bungkusan","t":"inti"},{"h":"寄","p":"jì","a":"mengirim lewat pos","t":"inti"},{"h":"取","p":"qǔ","a":"mengambil","t":"inti"},{"h":"银行","p":"yínháng","a":"bank","t":"inti"},{"h":"填","p":"tián","a":"mengisi (formulir)","t":"inti"},{"h":"排队","p":"páiduì","a":"antre","t":"inti"},{"h":"办","p":"bàn","a":"mengurus","t":"inti"},{"h":"几天","p":"jǐtiān","a":"beberapa hari","t":"inti"},{"h":"表格","p":"biǎogé","a":"formulir","t":"tambahan"},{"h":"窗口","p":"chuāngkǒu","a":"loket","t":"tambahan"},{"h":"身份证","p":"shēnfènzhèng","a":"KTP / kartu identitas","t":"tambahan"},{"h":"收到","p":"shōudào","a":"menerima","t":"tambahan"},{"h":"重","p":"zhòng","a":"berat","t":"tambahan"},{"h":"取钱","p":"qǔ qián","a":"menarik uang","t":"tambahan"},{"h":"快递员","p":"kuàidìyuán","a":"kurir","t":"tambahan"},{"h":"门口","p":"ménkǒu","a":"pintu depan","t":"tambahan"},{"h":"回来","p":"huílai","a":"kembali / pulang","t":"tambahan"},{"h":"张","p":"zhāng","a":"lembar (kata bantu)","t":"tambahan"},{"h":"拿","p":"ná","a":"mengambil / memegang","t":"tambahan"},{"h":"雅加达","p":"Yǎjiādá","a":"Jakarta (nama tempat)","t":"tambahan"},{"h":"邮局","p":"yóujú","a":"kantor pos","t":"tambahan"}]},{"n":14,"h":"天气和旅行","py":"tiānqì hé lǚxíng","t":"Cuaca, Rencana Liburan & Pesan Tiket","w":[{"h":"旅游","p":"lǚyóu","a":"berwisata","t":"inti"},{"h":"计划","p":"jìhuà","a":"rencana","t":"inti"},{"h":"打算","p":"dǎsuan","a":"berencana","t":"inti"},{"h":"机票","p":"jīpiào","a":"tiket pesawat","t":"inti"},{"h":"酒店","p":"jiǔdiàn","a":"hotel","t":"inti"},{"h":"照片","p":"zhàopiān","a":"foto","t":"inti"},{"h":"听说","p":"tīngshuō","a":"kabarnya / dengar-dengar","t":"inti"},{"h":"出发","p":"chūfā","a":"berangkat","t":"inti"},{"h":"会","p":"huì","a":"akan (prediksi)","t":"inti"},{"h":"下雨","p":"xiàyǔ","a":"hujan","t":"inti"},{"h":"带伞","p":"dàisǎn","a":"membawa payung","t":"inti"},{"h":"巴厘岛","p":"Bālídǎo","a":"Bali","t":"inti"},{"h":"订","p":"dìng","a":"memesan","t":"inti"},{"h":"天气预报","p":"tiānqì yùbào","a":"prakiraan cuaca","t":"tambahan"},{"h":"凉快","p":"liángkuài","a":"sejuk","t":"tambahan"},{"h":"到达","p":"dàodá","a":"tiba","t":"tambahan"},{"h":"好玩","p":"hǎowán","a":"seru / menyenangkan","t":"tambahan"},{"h":"景点","p":"jǐngdiǎn","a":"tempat wisata","t":"tambahan"},{"h":"护照","p":"hùzhào","a":"paspor","t":"tambahan"},{"h":"拍","p":"pāi","a":"memotret / mengambil (foto)","t":"tambahan"},{"h":"前台","p":"qiántái","a":"resepsionis","t":"tambahan"}]},{"n":16,"h":"我的经历","py":"wǒ de jīnglì","t":"Bercerita Pengalaman & Kejadian","w":[{"h":"过","p":"guò","a":"pernah (penanda pengalaman)","t":"inti"},{"h":"以前","p":"yǐqián","a":"dulu / sebelum","t":"inti"},{"h":"第一次","p":"dì yī cì","a":"pertama kali","t":"inti"},{"h":"去年","p":"qùnián","a":"tahun lalu","t":"inti"},{"h":"后来","p":"hòulái","a":"kemudian","t":"inti"},{"h":"刚才","p":"gāngcái","a":"tadi (baru saja)","t":"inti"},{"h":"终于","p":"zhōngyú","a":"akhirnya","t":"inti"},{"h":"突然","p":"tūrán","a":"tiba-tiba","t":"inti"},{"h":"开心","p":"kāixīn","a":"senang","t":"inti"},{"h":"是……的","p":"shì … de","a":"penanda penekanan waktu/cara","t":"inti"},{"h":"学过","p":"xuéguò","a":"pernah belajar","t":"inti"},{"h":"去过","p":"qùguò","a":"pernah pergi","t":"inti"},{"h":"经历","p":"jīnglì","a":"pengalaman","t":"tambahan"},{"h":"难忘","p":"nánwàng","a":"tak terlupakan","t":"tambahan"},{"h":"遇到","p":"yùdào","a":"bertemu / menemui","t":"tambahan"},{"h":"害怕","p":"hàipà","a":"takut","t":"tambahan"},{"h":"机会","p":"jīhuì","a":"kesempatan","t":"tambahan"},{"h":"当时","p":"dāngshí","a":"saat itu","t":"tambahan"},{"h":"出国","p":"chūguó","a":"pergi ke luar negeri","t":"tambahan"},{"h":"聊天","p":"liáotiān","a":"mengobrol","t":"tambahan"},{"h":"简单","p":"jiǎndān","a":"sederhana","t":"tambahan"},{"h":"敢","p":"gǎn","a":"berani","t":"tambahan"}]},{"n":17,"h":"比较和选择","py":"bǐjiào hé xuǎnzé","t":"Membandingkan & Memilih","w":[{"h":"比","p":"bǐ","a":"dibanding","t":"inti"},{"h":"更","p":"gèng","a":"lebih lagi","t":"inti"},{"h":"最","p":"zuì","a":"paling","t":"inti"},{"h":"一样","p":"yíyàng","a":"sama","t":"inti"},{"h":"没有……那么","p":"méiyǒu … nàme","a":"tidak se-… itu","t":"inti"},{"h":"越来越","p":"yuè lái yuè","a":"semakin","t":"inti"},{"h":"差不多","p":"chàbuduō","a":"hampir sama / kurang lebih","t":"inti"},{"h":"哪个","p":"nǎge","a":"yang mana","t":"inti"},{"h":"便宜","p":"piányi","a":"murah","t":"inti"},{"h":"贵","p":"guì","a":"mahal","t":"inti"},{"h":"方便","p":"fāngbiàn","a":"praktis","t":"inti"},{"h":"舒服","p":"shūfu","a":"nyaman","t":"inti"},{"h":"选","p":"xuǎn","a":"memilih","t":"tambahan"},{"h":"区别","p":"qūbié","a":"perbedaan","t":"tambahan"},{"h":"相同","p":"xiāngtóng","a":"sama","t":"tambahan"},{"h":"好用","p":"hǎoyòng","a":"enak dipakai","t":"tambahan"},{"h":"高","p":"gāo","a":"tinggi","t":"tambahan"},{"h":"低","p":"dī","a":"rendah","t":"tambahan"},{"h":"新","p":"xīn","a":"baru","t":"tambahan"},{"h":"旧","p":"jiù","a":"lama (barang)","t":"tambahan"},{"h":"别的","p":"biéde","a":"yang lain","t":"tambahan"},{"h":"像","p":"xiàng","a":"mirip","t":"tambahan"},{"h":"适合","p":"shìhé","a":"cocok","t":"tambahan"},{"h":"班","p":"bān","a":"kelas (kelompok belajar)","t":"tambahan"},{"h":"长","p":"cháng","a":"panjang / lama","t":"tambahan"},{"h":"不错","p":"búcuò","a":"lumayan bagus","t":"tambahan"}]},{"n":18,"h":"说意见和理由","py":"shuō yìjiàn hé lǐyóu","t":"Menyampaikan Pendapat, Alasan & Saran","w":[{"h":"因为……所以……","p":"yīnwèi … suǒyǐ","a":"karena … maka …","t":"inti"},{"h":"虽然……但是……","p":"suīrán … dànshì","a":"meskipun … tetapi …","t":"inti"},{"h":"如果……就……","p":"rúguǒ … jiù","a":"jika … maka …","t":"inti"},{"h":"应该","p":"yīnggāi","a":"seharusnya","t":"inti"},{"h":"最好","p":"zuìhǎo","a":"sebaiknya","t":"inti"},{"h":"建议","p":"jiànyì","a":"menyarankan / saran","t":"inti"},{"h":"同意","p":"tóngyì","a":"setuju","t":"inti"},{"h":"不同意","p":"bùtóngyì","a":"tidak setuju","t":"inti"},{"h":"而且","p":"érqiě","a":"lagipula","t":"inti"},{"h":"所以","p":"suǒyǐ","a":"jadi / karenanya","t":"inti"},{"h":"因为","p":"yīnwèi","a":"karena","t":"inti"},{"h":"考虑","p":"kǎolǜ","a":"mempertimbangkan","t":"inti"},{"h":"意见","p":"yìjiàn","a":"pendapat","t":"tambahan"},{"h":"理由","p":"lǐyóu","a":"alasan","t":"tambahan"},{"h":"可是","p":"kěshì","a":"tetapi (lisan)","t":"tambahan"},{"h":"原因","p":"yuányīn","a":"sebab","t":"tambahan"},{"h":"决定","p":"juédìng","a":"memutuskan","t":"tambahan"},{"h":"日惹","p":"Rìrě","a":"Yogyakarta (nama tempat)","t":"tambahan"},{"h":"部分","p":"bùfen","a":"bagian","t":"tambahan"},{"h":"讨论","p":"tǎolùn","a":"berdiskusi","t":"tambahan"}]},{"n":19,"h":"出问题了","py":"chū wèntí le","t":"Keluhan, Perbaikan & Minta Maaf","w":[{"h":"把","p":"bǎ","a":"penanda objek (memindahkan","t":"inti"},{"h":"被","p":"bèi","a":"di- (pasif)","t":"inti"},{"h":"坏","p":"huài","a":"rusak","t":"inti"},{"h":"修","p":"xiū","a":"memperbaiki","t":"inti"},{"h":"丢","p":"diū","a":"hilang / kehilangan","t":"inti"},{"h":"找到","p":"zhǎodào","a":"menemukan","t":"inti"},{"h":"退","p":"tuì","a":"mengembalikan","t":"inti"},{"h":"换","p":"huàn","a":"menukar","t":"inti"},{"h":"解决","p":"jiějué","a":"menyelesaikan masalah","t":"inti"},{"h":"问题","p":"wèntí","a":"masalah","t":"inti"},{"h":"不好意思","p":"bù hǎoyìsi","a":"maaf / permisi","t":"inti"},{"h":"道歉","p":"dàoqiàn","a":"minta maaf","t":"tambahan"},{"h":"抱歉","p":"bàoqiàn","a":"mohon maaf","t":"tambahan"},{"h":"生气","p":"shēngqì","a":"marah","t":"tambahan"},{"h":"担心","p":"dānxīn","a":"khawatir","t":"tambahan"},{"h":"满意","p":"mǎnyì","a":"puas","t":"tambahan"},{"h":"订单","p":"dìngdān","a":"pesanan","t":"tambahan"},{"h":"发错","p":"fācuò","a":"salah kirim","t":"tambahan"},{"h":"补","p":"bǔ","a":"mengganti / melengkapi","t":"tambahan"},{"h":"蓝色","p":"lánsè","a":"biru","t":"tambahan"},{"h":"红色","p":"hóngsè","a":"merah","t":"tambahan"},{"h":"摔","p":"shuāi","a":"terjatuh / membanting","t":"tambahan"}]}];
+const KEY='himawari_kartu_v1';
+let mem={};try{mem=JSON.parse(localStorage.getItem(KEY)||'{}')}catch(e){}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(mem))}catch(e){}};
+const $=id=>document.getElementById(id);
+let sel='all',mode=0,idx=0,list=[];
+const wid=(c,w)=>c.n+'|'+w.h;
+const esc=s=>s.replace(/[&<>]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));
+
+function chips(){
+  const tot=DATA.reduce((a,c)=>a+c.w.length,0);
+  let h=`<button class="chip ${sel==='all'?'on':''}" data-c="all">Semua (${tot})</button>`;
+  DATA.forEach(c=>{h+=`<button class="chip ${sel==c.n?'on':''}" data-c="${c.n}">Bab ${c.n}</button>`});
+  $('chips').innerHTML=h;
+  $('chtitle').innerHTML=sel==='all'?'<b>Semua bab</b> · kosakata inti dan kata tambahan':(()=>{const c=DATA.find(x=>x.n==sel);return `<b>Bab ${c.n}</b> · ${esc(c.h)} (${esc(c.py)}) · ${esc(c.t)}`})();
+}
+function build(keep){
+  const incExtra=$('extra').checked,only=$('only').checked;
+  let l=[];
+  DATA.forEach(c=>{ if(sel==='all'||sel==c.n) c.w.forEach(w=>{ if(w.t==='tambahan'&&!incExtra) return; if(only&&mem[wid(c,w)]) return; l.push({c,w}); }); });
+  if($('shuf').checked){for(let i=l.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[l[i],l[j]]=[l[j],l[i]]}}
+  list=l; if(!keep) idx=0; if(idx>=list.length) idx=Math.max(0,list.length-1);
+  render();
+}
+function counts(){
+  let tot=0,ok=0;
+  const incExtra=$('extra').checked;
+  DATA.forEach(c=>{ if(sel==='all'||sel==c.n) c.w.forEach(w=>{ if(w.t==='tambahan'&&!incExtra) return; tot++; if(mem[wid(c,w)]) ok++; }); });
+  $('hafal').textContent=`Hafal ${ok} dari ${tot}`;
+  $('pb').style.width=(tot?ok/tot*100:0)+'%';
+}
+function render(){
+  counts();
+  const empty=!list.length;
+  $('stage').style.display=empty?'none':'block'; $('nav').style.display=empty?'none':'flex'; $('done').style.display=empty?'block':'none';
+  if(empty){$('pos').textContent='Kartu 0/0';$('donetxt').textContent=$('only').checked?'Semua kartu di pilihan ini sudah kamu tandai hafal. Mantap!':'Tidak ada kartu di pilihan ini.';return;}
+  const {c,w}=list[idx]; const key=wid(c,w);
+  $('pos').textContent=`Kartu ${idx+1}/${list.length}`;
+  $('card').classList.remove('flip');
+  const tag=`<span class="tag ${w.t==='tambahan'?'tb':''}">Bab ${c.n} · ${w.t==='tambahan'?'tambahan':'inti'}</span>`;
+  const spk=`<button class="spk" id="spk" aria-label="Dengarkan pengucapan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/></svg></button>`;
+  const fs=w.h.length<=3?110:w.h.length<=5?84:w.h.length<=8?60:44;
+  if(mode===0){
+    $('front').innerHTML=tag+spk+`<div class="hz" style="font-size:${fs}px">${esc(w.h)}</div><div class="py">${esc(w.p)}</div><div class="hint">Ketuk untuk lihat arti</div>`;
+    $('back').innerHTML=tag+`<div class="ar">${esc(w.a)}</div><div class="sub"><span class="hz" style="font-size:28px">${esc(w.h)}</span> · ${esc(w.p)}</div>`;
+  }else{
+    $('front').innerHTML=tag+`<div class="sub">Apa pinyin-nya?</div><div class="ar">${esc(w.a)}</div><div class="hint">Ketuk untuk lihat jawaban</div>`;
+    $('back').innerHTML=tag+spk+`<div class="py" style="font-size:42px">${esc(w.p)}</div><div class="hz" style="font-size:${Math.min(fs,84)}px">${esc(w.h)}</div><div class="sub">${esc(w.a)}</div>`;
+  }
+  document.querySelectorAll('#spk').forEach(b=>b.onclick=e=>{e.stopPropagation();say(w.h)});
+}
+function say(t){
+  try{
+    if(!('speechSynthesis' in window)) return alert('Browser ini belum mendukung suara. Coba Chrome.');
+    speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(t); u.lang='zh-CN'; u.rate=.8;
+    const v=speechSynthesis.getVoices().find(v=>/^zh/i.test(v.lang)); if(v) u.voice=v; speechSynthesis.speak(u);
+  }catch(e){}
+}
+const flip=()=>$('card').classList.toggle('flip');
+const go=d=>{if(!list.length)return; idx=(idx+d+list.length)%list.length; render()};
+function mark(v){
+  if(!list.length) return; const {c,w}=list[idx]; const k=wid(c,w);
+  if(v) mem[k]=1; else delete mem[k]; save();
+  if($('only').checked&&v){list.splice(idx,1); if(idx>=list.length) idx=0; render();} else go(1);
+}
+$('chips').onclick=e=>{const b=e.target.closest('.chip'); if(!b) return; sel=b.dataset.c==='all'?'all':+b.dataset.c; chips(); build(false)};
+$('mode').onclick=e=>{const b=e.target.closest('button'); if(!b) return; mode=+b.dataset.m; document.querySelectorAll('#mode button').forEach(x=>x.classList.toggle('on',x===b)); render()};
+['extra','only','shuf'].forEach(i=>$(i).onchange=()=>build(false));
+$('card').onclick=flip; $('card').onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();flip()}};
+$('prev').onclick=()=>go(-1); $('next').onclick=()=>go(1); $('ok').onclick=()=>mark(true); $('bad').onclick=()=>mark(false);
+$('again').onclick=()=>{ $('only').checked=false; build(false) };
+$('reset').onclick=()=>{ if(confirm('Hapus semua tanda hafal di browser ini?')){mem={};save();build(true)} };
+document.addEventListener('keydown',e=>{ if(e.target.tagName==='INPUT') return; if(e.key==='ArrowRight')go(1); if(e.key==='ArrowLeft')go(-1); });
+let sx=null; const st=$('stage');
+st.addEventListener('touchstart',e=>{sx=e.touches[0].clientX},{passive:true});
+st.addEventListener('touchend',e=>{ if(sx===null) return; const dx=e.changedTouches[0].clientX-sx; sx=null; if(Math.abs(dx)>60) go(dx<0?1:-1); });
+chips(); build(false);
+</script>
+</body>
+</html>
