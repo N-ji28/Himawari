@@ -102,7 +102,7 @@ table.res td:last-child{text-align:right;font-weight:700}
       <li>Jawaban tersimpan otomatis. Jika koneksi putus, masuk lagi dengan email yang sama selama waktu masih ada.</li>
       <li>Bagian A (soal 1–10): dengarkan audio, pilih A/B/C/D. Tiap audio hanya bisa diputar 2 kali. Pakai headset.</li>
       <li>Bagian B (soal 11–15): dengarkan audio, lalu rekam voice note kesimpulan 30–40 detik dalam bahasa Mandarin.</li>
-      <li>Bagian C (soal 16–20): baca teks, lalu rekam voice note kesimpulan 30–40 detik. Izinkan akses mikrofon.</li>
+      <li>Bagian C (soal 16–20): baca teks (16–17) atau lihat gambar berurutan (18–20), lalu rekam voice note kesimpulan 30–40 detik. Izinkan akses mikrofon.</li>
       <li>Wajib memakai pola kalimat yang tertera. Voice note dinilai oleh Laoshi (0–20 per soal).</li>
       <li>Jangan berpindah tab saat ujian. Peringatan 2 kali; perpindahan ketiga mengunci ujian.</li>
     </ul></div>
@@ -160,7 +160,7 @@ $('btn-start').addEventListener('click',function(){
 function secInfo(id){
   if(id<=10)return{tag:'A · 听力 Tingli (Pilihan Ganda)',part:'Dengarkan audio (maksimal 2 kali), lalu pilih jawaban yang paling tepat.'};
   if(id<=15)return{tag:'B · 听力 → Kesimpulan (Voice Note)',part:'Dengarkan audio, lalu rekam voice note kesimpulan 30–40 detik dalam bahasa Mandarin. Wajib memakai pola yang tertera.'};
-  return{tag:'C · Teks → Kesimpulan (Voice Note)',part:'Baca teks, lalu rekam voice note kesimpulan 30–40 detik dalam bahasa Mandarin. Wajib memakai pola yang tertera.'};
+  return{tag:'C · Teks → Kesimpulan (Voice Note)',part:'Baca teks atau lihat gambar berurutan, lalu rekam voice note 30–40 detik dalam bahasa Mandarin: ceritakan dan beri kesimpulan. Wajib memakai pola yang tertera.'};
 }
 function isVN(q){return q.q.kind==='vn';}
 function startExam(){show('s-exam');buildGrid();renderQ(0);updateProg();vnLoad();tickTimer();S.tick=setInterval(tickTimer,500);}
@@ -210,6 +210,7 @@ function vnPickMime(){var c=['audio/webm;codecs=opus','audio/webm','audio/mp4','
 function vnBlock(card,q){
   var p=q.q,n=q.id;var canRec=!!(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia&&window.MediaRecorder);
   if(p.zh){card.appendChild(el('div','qt',p.judul));var z=el('div','zhbox');z.appendChild(el('div','hz',p.zh));z.appendChild(el('div','py',p.py));card.appendChild(z);}
+  if(p.imgs){card.appendChild(el('div','qt',p.judul));var g=el('div');g.style.cssText='display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0';p.imgs.forEach(function(n,i){var w=el('div');w.style.position='relative';var im=el('img');im.src='img/'+n+'.png';im.alt='Gambar '+(i+1);im.style.cssText='width:100%;border:1px solid var(--line);border-radius:10px;display:block';var nb=el('span',null,String(i+1));nb.style.cssText='position:absolute;left:6px;top:6px;background:var(--green);color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px';w.appendChild(im);w.appendChild(nb);g.appendChild(w);});card.appendChild(g);}
   var box=el('div','vn');box.appendChild(el('div','st','Pertanyaan pemandu (jawab dalam ceritamu):'));
   var ol=el('ol');p.tanya.forEach(function(t){ol.appendChild(el('li',null,t));});box.appendChild(ol);
   var pl=el('div');pl.appendChild(el('span','st','Pola wajib: '));p.pola.forEach(function(x){pl.appendChild(el('span','pat',x));});box.appendChild(pl);
